@@ -6,12 +6,12 @@ from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm
 class EmployerSignUpView(CreateView):
     form_class = SignUpEmployerForm
     model = Employer
-    template_name = "auth/auth_employer.html"
+    template_name = "auth/sign_up_employer.html"
     success_url = "/"
 
 
 class JobSeekerSignUpView(CreateView):
     form_class = SignUpJobSeekerForm
     model = JobSeeker
-    template_name = "auth/auth_jobseeker.html"
+    template_name = "auth/sign_up_jobseeker.html"
     success_url = "/"
