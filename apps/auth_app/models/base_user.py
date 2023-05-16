@@ -1,8 +1,10 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
 
 class User(AbstractUser):
+    email = models.EmailField(blank=False)
+
     class Types(models.TextChoices):
         ADMIN = "ADMIN", "Admin"
         JOBSEEKER = "JOBSEEKER", "Job seeker"
@@ -13,5 +15,5 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.type = self.base_type
+            self.account_type = self.base_type
             return super().save(*args, **kwargs)

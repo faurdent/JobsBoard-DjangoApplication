@@ -6,6 +6,7 @@ from apps.auth_app.models.managers import JobSeekerManager, EmployerManager
 
 class JobSeeker(User):
     objects = JobSeekerManager()
+    base_type = User.Types.JOBSEEKER
 
     class Meta:
         proxy = True
@@ -13,6 +14,7 @@ class JobSeeker(User):
 
 class Employer(User):
     objects = EmployerManager()
+    base_type = User.Types.EMPLOYER
 
     class Meta:
         proxy = True
