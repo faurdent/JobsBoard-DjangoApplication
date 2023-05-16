@@ -1,0 +1,16 @@
+{% extends "auth/_auth_form.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ block.super }} | Job Seeker{% endblock %}</title>
+</head>
+<body>
+{% block header %}
+<h1>Create job-seeker account</h1>
+{% endblock %}
+{% block footer %}
+<a href="{% url 'register_employer' %}">Create employer account</a>
+{% endblock %}
+</body>
+</html>
