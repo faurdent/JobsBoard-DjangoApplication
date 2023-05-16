@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+from django.urls import reverse_lazy
 
 
 class User(AbstractUser):
@@ -12,6 +13,9 @@ class User(AbstractUser):
 
     base_type = Types.ADMIN
     account_type = models.CharField(max_length=20, choices=Types.choices)
+
+    def get_absolute_url(self):
+        return reverse_lazy("profile", username=self.username)
 
     def save(self, *args, **kwargs):
         if not self.pk:
