@@ -1,0 +1,16 @@
+{% extends "_base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Find a job{% endblock %}</title>
+</head>
+<body>
+{% block content %}
+    <h1>For all job seekers</h1>
+    <h3>Find vacancies that fit you:</h3>
+    <form></form>
+    {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+{% endblock %}
+</body>
+</html>
