@@ -6,19 +6,32 @@
     <title>{% block title %}Publish vacancies. Find employees{% endblock %}</title>
 </head>
 <body>
-<h1>For employers</h1>
-{% if user.account_type == user.Types.EMPLOYER %}
-    {% if user.employee_profile.has_company %}
-        <a href="#">Publish vacancies</a>
-    {% else %}
-        <a href="#">Create your company account</a>
+{% block header %}
+    <nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'me' %}">Profile</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register_jobseeker' %}">Sign Up</a>
+        {% endif %}
+    <a href="{% url 'home' %}">Job seekers</a>
+    </nav>
+{% endblock %}
+{% block content %}
+    <h1>For employers</h1>
+    {% if user.is_authenticated and user.account_type == user.Types.EMPLOYER %}
+        {% if user.employee_profile.has_company %}
+            <a href="#">Publish vacancies</a>
+        {% else %}
+            <a href="#">Create your company account</a>
+        {% endif %}
     {% endif %}
-{% endif %}
-{% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
-<h2>Find candidate:</h2>
-<form>
+    {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+    <h2>Find candidate:</h2>
+    <form>
 
-</form>
-<form></form>
+    </form>
+{% endblock %}
+
 </body>
 </html>

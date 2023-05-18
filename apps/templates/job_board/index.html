@@ -6,6 +6,17 @@
     <title>{% block title %}Find a job{% endblock %}</title>
 </head>
 <body>
+{% block header %}
+    <nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'me' %}">Profile</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register_jobseeker' %}">Sign Up</a>
+        {% endif %}
+        <a href="{% url 'employer_home' %}">Employers</a>
+    </nav>
+{% endblock %}
 {% block content %}
     <h1>For all job seekers</h1>
     <h3>Find vacancies that fit you:</h3>
