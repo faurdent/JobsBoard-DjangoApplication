@@ -1,4 +1,3 @@
-from django.contrib.auth.models import Group
 from django.db import models
 
 from apps.auth_app.models.base_user import User
@@ -17,16 +16,8 @@ class Employer(User):
     objects = EmployerManager()
     base_type = User.Types.EMPLOYER
 
-    def save(self, *args, **kwargs):
-        employer: Employer = super().save(*args, **kwargs)
-        owner_group = Group.objects.get(name="Owner")
-        employer.groups.add(owner_group)
-
     class Meta:
         proxy = True
-        permissions = [
-            ("add_CV", "Can upload CV"),
-        ]
 
 
 class JobSeekerProfile(models.Model):
