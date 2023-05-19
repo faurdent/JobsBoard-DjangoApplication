@@ -1,11 +1,5 @@
 {% extends "_base.html" %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Publish vacancies. Find employees{% endblock %}</title>
-</head>
-<body>
+{% block title %}Publish vacancies. Find employees{% endblock %}
 {% block header %}
     <nav>
         {% if user.is_authenticated %}
@@ -14,7 +8,7 @@
             <a href="{% url 'login' %}">Login</a>
             <a href="{% url 'register_jobseeker' %}">Sign Up</a>
         {% endif %}
-    <a href="{% url 'home' %}">Job seekers</a>
+        <a href="{% url 'home' %}">Job seekers</a>
     </nav>
 {% endblock %}
 {% block content %}
@@ -23,7 +17,7 @@
         {% if user.employee_profile.has_company %}
             <a href="#">Publish vacancies</a>
         {% else %}
-            <a href="#">Create your company account</a>
+            <a href="{% url 'create_company' %}">Create your company account</a>
         {% endif %}
     {% endif %}
     {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
@@ -32,6 +26,3 @@
 
     </form>
 {% endblock %}
-
-</body>
-</html>
