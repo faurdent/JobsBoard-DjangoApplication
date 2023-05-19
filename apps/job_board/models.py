@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from apps.auth_app.models import JobSeekerProfile, EmployerProfile
 
 from django.db import models
@@ -12,7 +14,10 @@ class CompanyOwnership(models.Model):
 class Company(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    owners = models.ManyToManyField(EmployerProfile, through=CompanyOwnership)
+    owners = models.ManyToManyField(EmployerProfile, through=CompanyOwnership, related_name="companies")
+
+    def get_absolute_url(self):
+        return reverse("company_details", kwargs={"pk": self.pk})
 
 
 class PositionType(models.Model):
@@ -23,3 +28,9 @@ class Vacancy(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     position = models.ForeignKey(PositionType, on_delete=models.PROTECT)
+
+
+# class EmploymentInfo:
+#     @staticmethod
+#     def get_all_employed():
+#
