@@ -27,10 +27,5 @@ class PositionType(models.Model):
 class Vacancy(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    position = models.ForeignKey(PositionType, on_delete=models.PROTECT)
-
-
-# class EmploymentInfo:
-#     @staticmethod
-#     def get_all_employed():
-#
+    position = models.ForeignKey(PositionType, on_delete=models.PROTECT, related_name="position_vacancies")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="vacancies")
