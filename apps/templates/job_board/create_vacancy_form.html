@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% block content %}
+<h1>Create vacancy for your company</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit">
+    </form>
+{% endblock %}
