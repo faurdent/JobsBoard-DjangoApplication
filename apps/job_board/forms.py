@@ -4,7 +4,7 @@ from apps.auth_app.models import User
 from apps.job_board.models import Company, Vacancy
 
 
-class CreateCompanyForm(forms.ModelForm):
+class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
         fields = ("name", "description")
