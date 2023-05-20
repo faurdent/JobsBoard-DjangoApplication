@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.views.generic import TemplateView, CreateView, DetailView, ListView
 
 from apps.auth_app.models import JobSeekerProfile
-from apps.job_board.forms import CreateCompanyForm
+from apps.job_board.forms import CreateCompanyForm, CreateVacancyForm
 from apps.job_board.models import Company, Vacancy, CompanyOwnership
 
 
@@ -77,16 +77,31 @@ class ViewCompanies(ListView):
     template_name = "job_board/view_all_companies.html"
 
 
-class CreateVacancy:
-    pass
+class CreateVacancy(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "job_board.add_vacancy"
+    model = Vacancy
+    form_class = CreateVacancyForm
+    template_name = "job_board/create_vacancy_form.html"
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.form_class
+        return form_class(self.request.user, **self.get_form_kwargs())
+
+    def get(self, request, *args, **kwargs):
+        res = super().get(request, *args, **kwargs)
+        print()
+        return res
 
 
 class UpdateVacancy:
     pass
 
 
-class DetailVacancy:
-    pass
+class DetailVacancy(DetailView):
+    model = Vacancy
+    template_name = "job_board/detail_vacancy.html"
+    context_object_name = "vacancy"
 
 
 class ViewVacancies:
