@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import TemplateView, CreateView, DetailView
+from django.views.generic import TemplateView, CreateView, DetailView, ListView
 
 from apps.auth_app.models import JobSeekerProfile
 from apps.job_board.forms import CreateCompanyForm
@@ -71,8 +71,10 @@ class DetailCompany(DetailView):
         return context
 
 
-class ViewCompanies:
-    pass
+class ViewCompanies(ListView):
+    model = Company
+    context_object_name = "companies"
+    template_name = "job_board/view_all_companies.html"
 
 
 class CreateVacancy:
