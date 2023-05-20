@@ -30,6 +30,6 @@
         {% endif %}
     </div>
     {% if is_company_owner %}
-        <a href="#">Update Info</a>
+        <a href="{% url 'update_company' company.pk %}">Update Info</a>
     {% endif %}
 {% endblock %}

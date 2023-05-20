@@ -3,4 +3,7 @@
     <h1>{{ vacancy.name }}</h1>
     <h4>Posted by: <a href="{{ vacancy.company.get_absolute_url }}">{{ vacancy.company.name }}</a></h4>
     <p>{{ vacancy.description }}</p>
+    {% if can_change_vacancy %}
+        <a href="#">Update info</a>
+    {% endif %}
 {% endblock %}
