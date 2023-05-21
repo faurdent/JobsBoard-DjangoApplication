@@ -38,3 +38,19 @@ class Vacancy(models.Model):
 
     def get_absolute_url(self):
         return reverse("vacancy_details", kwargs={"pk": self.pk})
+
+
+class Employee(models.Model):
+    position = models.ForeignKey(PositionType, on_delete=models.PROTECT)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    profile = models.OneToOneField(JobSeekerProfile, on_delete=models.PROTECT)
+
+
+class VacancyResponses(models.Model):
+    class ResponseStatus(models.TextChoices):
+        PENDING = ("PENDING", "Pending")
+        ACCEPTED = ("ACCEPTED", "Accepted")
+        REJECTED = ("REJECTED", "Rejected")
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(JobSeekerProfile, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=ResponseStatus.choices, default=ResponseStatus.PENDING)
