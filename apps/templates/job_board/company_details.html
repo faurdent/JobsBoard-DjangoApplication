@@ -1,0 +1,35 @@
+{% extends "_base.html" %}
+{% block title %}Company | {{ company.name }}{% endblock %}
+{% block content %}
+    <h1>{{ company.name }}</h1>
+    <p>{{ company.description }}</p>
+    <ul>
+        <li>
+            <div>
+                <a href="#">Owners: {{ owners_count }}</a>
+            </div>
+        </li>
+
+        <li>
+            <div>
+                {% if workers_count > 0 %}
+                    <a href="#">Workers: {{ workers_count }}</a>
+                {% else %}
+                    <p>Workers list is empty</p>
+                {% endif %}
+
+            </div>
+        </li>
+    </ul>
+    <div>
+        <h3>Company vacancies: {{ vacancies_count }}</h3>
+        {% if vacancies_count > 0 %}
+            <a href="#">View vacancies</a>
+        {% else %}
+            <p>There is no vacancies yet</p>
+        {% endif %}
+    </div>
+    {% if is_company_owner %}
+        <a href="{% url 'update_company' company.pk %}">Update Info</a>
+    {% endif %}
+{% endblock %}

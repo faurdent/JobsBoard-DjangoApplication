@@ -22,9 +22,13 @@ class Employer(User):
 
 class JobSeekerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="jobseeker_profile")
+    cv = models.FileField(upload_to="cv", blank=True, null=True, default=None)
     jobseeker_id = models.IntegerField(null=True, blank=True)
+    skills = models.ManyToManyField("job_board.PositionType")
+    company = models.ForeignKey("job_board.Company", on_delete=models.PROTECT, related_name="workers")
 
 
 class EmployerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employer_profile")
+    has_company = models.BooleanField(default=False)
     owner_id = models.IntegerField(null=True, blank=True)
