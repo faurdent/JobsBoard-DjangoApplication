@@ -23,3 +23,9 @@ class CreateVacancyForm(forms.ModelForm):
         if user.account_type == User.Types.JOBSEEKER:
             return [] # TODO: Return HR current company
         return user.employer_profile.companies
+
+
+class UpdateVacancyForm(forms.ModelForm):
+    class Meta:
+        model = Vacancy
+        fields = ("name", "description")
