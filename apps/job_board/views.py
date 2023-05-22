@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
 
 from apps.auth_app.models import JobSeekerProfile, User
-from apps.job_board.forms import CompanyForm, CreateVacancyForm
+from apps.job_board.forms import CompanyForm, CreateVacancyForm, UpdateVacancyForm
 from apps.job_board.models import Company, Vacancy, CompanyOwnership
 
 
@@ -106,7 +106,12 @@ class CreateVacancy(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_required = "job_board.add_vacancy"
     model = Vacancy
     form_class = CreateVacancyForm
-    template_name = "job_board/create_vacancy_form.html"
+    template_name = "job_board/vacancy_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"title": "Create vacancy", "message": "Create vacancy for your company"})
+        return context
 
     def get_form(self, form_class=None):
         if form_class is None:
@@ -114,8 +119,15 @@ class CreateVacancy(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         return form_class(self.request.user, **self.get_form_kwargs())
 
 
-class UpdateVacancy:
-    pass
+class UpdateVacancy(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    form_class = UpdateVacancyForm
+    model = Vacancy
+    permission_required = "job_board.change_vacancy"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"title": "Update vacancy", "message": "Update vacancy"})
+        return context
 
 
 class DetailVacancy(DetailView):
@@ -133,8 +145,10 @@ class DetailVacancy(DetailView):
         return context
 
 
-class ViewVacancies:
-    pass
+class ViewVacancies(ListView):
+    model = Vacancy
+    context_object_name = "vacancies"
+    template_name = "job_board/view_all_vacancies.html"
 
 
 class EntityNotFoundView(TemplateView):
