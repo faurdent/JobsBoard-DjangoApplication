@@ -14,4 +14,5 @@ urlpatterns = [
     path("errors/404", views.EntityNotFoundView.as_view(), name="not_found"),
     path("update-vacancy/<int:pk>", views.UpdateVacancy.as_view(), name="update_vacancy"),
     path("all-vacancies", views.ViewVacancies.as_view(), name="all_vacancies"),
+    path("change-response-status/<int:pk>", views.VacancyResponseView.as_view(), name="change_response")
 ]
