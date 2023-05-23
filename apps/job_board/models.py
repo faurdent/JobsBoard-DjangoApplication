@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from apps.auth_app.models import JobSeekerProfile, EmployerProfile
+from apps.auth_app.models import JobSeekerProfile, EmployerProfile, User
 
 from django.db import models
 
@@ -46,11 +46,11 @@ class Employee(models.Model):
     profile = models.OneToOneField(JobSeekerProfile, on_delete=models.PROTECT)
 
 
-class VacancyResponses(models.Model):
+class VacancyResponse(models.Model):
     class ResponseStatus(models.TextChoices):
         PENDING = ("PENDING", "Pending")
         ACCEPTED = ("ACCEPTED", "Accepted")
         REJECTED = ("REJECTED", "Rejected")
-    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE)
-    user_profile = models.ForeignKey(JobSeekerProfile, on_delete=models.CASCADE)
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="users_responded")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="left_responses")
     status = models.CharField(max_length=10, choices=ResponseStatus.choices, default=ResponseStatus.PENDING)
