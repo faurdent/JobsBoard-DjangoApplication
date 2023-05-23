@@ -6,4 +6,14 @@
     {% if can_change_vacancy %}
         <a href="#">Update info</a>
     {% endif %}
+    {% if user.account_type == user.Types.JOBSEEKER %}
+        <form action="{% url 'change_response' vacancy.pk %}" method="post">
+            {% csrf_token %}
+            {% if is_responded %}
+                <button type="submit" value="{{ vacancy.pk }}">Cancel</button>
+            {% else %}
+                <button type="submit" value="{{ vacancy.pk }}">Response to vacancy</button>
+            {% endif %}
+        </form>
+    {% endif %}
 {% endblock %}
