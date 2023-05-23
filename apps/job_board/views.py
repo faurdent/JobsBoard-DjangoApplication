@@ -1,10 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import redirect
+from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
 
 from apps.auth_app.models import JobSeekerProfile, User
 from apps.job_board.forms import CompanyForm, CreateVacancyForm, UpdateVacancyForm
-from apps.job_board.models import Company, Vacancy, CompanyOwnership
+from apps.job_board.models import Company, Vacancy, CompanyOwnership, VacancyResponse
 
 
 class IndexView(TemplateView):
@@ -137,11 +139,21 @@ class DetailVacancy(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context.update({
+            "is_responded": False,
+            "can_change_vacancy": False,
+        })
         vacancy: Vacancy = self.object
-        if vacancy.company.owners.filter(user=self.request.user).first():
-            context.update({"can_change_vacancy": True})
-        else:
-            context.update({"can_change_vacancy": False})
+        user: User = self.request.user
+        match user.account_type:
+            case user.Types.JOBSEEKER:
+                context.update({
+                    "is_responded": bool(vacancy.users_responded.filter(user=user).first())
+                })
+            case user.Types.EMPLOYER:
+                context.update({
+                    "can_change_vacancy": bool(vacancy.company.owners.filter(user=self.request.user).first())
+                })
         return context
 
 
@@ -158,3 +170,18 @@ class EntityNotFoundView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({"error": "Page not found", "error_message": "You don't have such record."})
         return context
+
+
+class VacancyResponseView(View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        vacancy = Vacancy.objects.filter(pk=self.kwargs["pk"]).first()
+        if not vacancy:
+            return redirect("not_found")
+        if existing_response := VacancyResponse.objects.filter(
+            user=request.user, vacancy=vacancy
+        ).first():
+            existing_response.delete()
+        else:
+            vacancy_response = VacancyResponse.objects.create(user=request.user, vacancy=vacancy)
+            vacancy.users_responded.add(vacancy_response)
+        return redirect("vacancy_details", pk=vacancy.pk)
