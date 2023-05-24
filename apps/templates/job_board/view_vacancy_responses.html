@@ -1,0 +1,14 @@
+{% extends "_base.html" %}
+{% block content %}
+    <h1>{{ vacancy_name }}</h1>
+    {% if not vacancy_responses %}
+        <p>There is no responses yet</p>
+    {% endif %}
+    {% for response in vacancy_responses %}
+        <div>
+            <h3>{{ response.user.username }}</h3>
+            <p>{{ response.status }}</p>
+            <hr>
+        </div>
+    {% endfor %}
+{% endblock %}
