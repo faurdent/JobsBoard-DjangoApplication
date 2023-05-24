@@ -1,12 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.db.models import QuerySet
-from django.http import Http404
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 
 from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm
 from apps.auth_app.models import JobSeeker, Employer, User
+from apps.job_board.models import CompanyOwnership, VacancyResponse
 
 
 class EmployerSignUpView(CreateView):
@@ -38,7 +39,7 @@ class ProfileView(LoginRequiredMixin, DetailView):
         if user := queryset.filter(username=username).select_related().first():
             return user
         else:
-            raise Http404
+            return redirect("not_found")
 
 
 class MyProfileView(ProfileView):
@@ -46,3 +47,13 @@ class MyProfileView(ProfileView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user: User = self.request.user
+        match user.account_type:
+            case User.Types.EMPLOYER:
+                context.update({"owned_companies": CompanyOwnership.objects.filter(owner=user.employer_profile).all()})
+            case User.Types.JOBSEEKER:
+                context.update({"responses_on_vacancies": VacancyResponse.objects.filter(user=user).all()})
+        return context
