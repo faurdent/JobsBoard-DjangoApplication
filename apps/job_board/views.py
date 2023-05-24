@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.handlers.wsgi import WSGIRequest
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
 
@@ -172,16 +172,43 @@ class EntityNotFoundView(TemplateView):
         return context
 
 
-class VacancyResponseView(View):
+class VacancyResponseView(LoginRequiredMixin, View):
     def post(self, request: WSGIRequest, *args, **kwargs):
         vacancy = Vacancy.objects.filter(pk=self.kwargs["pk"]).first()
         if not vacancy:
             return redirect("not_found")
         if existing_response := VacancyResponse.objects.filter(
-            user=request.user, vacancy=vacancy
+                user=request.user, vacancy=vacancy
         ).first():
             existing_response.delete()
         else:
             vacancy_response = VacancyResponse.objects.create(user=request.user, vacancy=vacancy)
             vacancy.users_responded.add(vacancy_response)
         return redirect("vacancy_details", pk=vacancy.pk)
+
+
+class ResponsesView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = VacancyResponse
+    permission_required = "job_board.view_vacancyresponse"
+    context_object_name = "vacancy_responses"
+    template_name = "job_board/view_vacancy_responses.html"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.vacancy = None
+
+    def get(self, request, *args, **kwargs):
+        self.vacancy = get_object_or_404(Vacancy, pk=self.kwargs["pk"])
+        if not CompanyOwnership.objects.filter(
+                company=self.vacancy.company, owner=self.request.user.employer_profile
+        ).first():
+            return redirect("not_found")
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.vacancy.users_responded.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"vacancy_name": self.vacancy.name})
+        return context
