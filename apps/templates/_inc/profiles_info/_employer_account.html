@@ -1,1 +1,22 @@
 <div>Employer specific data</div>
+<div>
+    <h2>My companies:</h2>
+{% if owned_companies %}
+    {% for ownership in owned_companies %}
+        <div>
+            <a href="{{ ownership.company.get_absolute_url }}">
+                <h4>{{ ownership.company.name }}</h4>
+            </a>
+            {% if ownership.is_creator %}
+                <p>Creator</p>
+            {% else %}
+                <p>Owner</p>
+            {% endif %}
+            <hr>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You don't have companies, <a href="{% url 'create_company' %}">create one</a></p>
+{% endif %}
+
+</div>

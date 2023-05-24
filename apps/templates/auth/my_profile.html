@@ -1,11 +1,4 @@
 {% extends "_base.html" %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}My Profile{% endblock %}</title>
-</head>
-<body>
 {% block content %}<h1>{{ object.username }}</h1>
     <p>{{ object.account_type.capitalize }}</p>
     {% if user_profile.account_type == user.Types.EMPLOYER %}
@@ -15,5 +8,3 @@
     {% endif %}
 
 {% endblock %}
-</body>
-</html>

@@ -1,0 +1,11 @@
+<div>
+    {% if responses_on_vacancies %}
+        {% for response in responses_on_vacancies %}
+            <a href="{{ response.vacancy.get_absolute_url }}"><h4>{{ response.vacancy.name }}</h4></a>
+            <a href="{{ response.vacancy.company.get_absolute_url }}">
+                <small>{{ response.vacancy.company.name }}</small>
+            </a>
+            <p>{{ response.status.capitalize }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
