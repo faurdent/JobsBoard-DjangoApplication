@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
 
-from apps.job_board.models import Company, Vacancy
+from apps.job_board.models import Company, Vacancy, VacancyResponse
 
 
 class Command(BaseCommand):
@@ -14,7 +14,9 @@ class Command(BaseCommand):
         company_permissions = Permission.objects.filter(content_type=company_content_type)
         vacancy_content_type = ContentType.objects.get_for_model(Vacancy)
         vacancy_permissions = Permission.objects.filter(content_type=vacancy_content_type)
-        all_permissions = [*company_permissions, *vacancy_permissions]
+        vacancy_response_type = ContentType.objects.get_for_model(VacancyResponse)
+        vacancy_responses_permissions = Permission.objects.filter(content_type=vacancy_response_type)
+        all_permissions = [*company_permissions, *vacancy_permissions, *vacancy_responses_permissions]
         owner_group, created_owner = Group.objects.get_or_create(name="Owner")
         for permission in all_permissions:
             owner_group.permissions.add(permission)
