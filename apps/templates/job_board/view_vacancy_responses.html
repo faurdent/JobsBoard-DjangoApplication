@@ -8,6 +8,18 @@
         <div>
             <h3>{{ response.user.username }}</h3>
             <p>{{ response.status }}</p>
+            <form action="">
+                <button>Accept</button>
+            </form>
+            {% if response.status == response.ResponseStatus.PENDING %}
+                <form action="{% url 'reject_jobseeker' response.vacancy.pk response.user.pk %}" method="post">
+                    {% csrf_token %}
+                    <button>Reject</button>
+                </form>
+            {% else %}
+
+            {% endif %}
+
             <hr>
         </div>
     {% endfor %}
