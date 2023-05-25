@@ -212,3 +212,20 @@ class ResponsesView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context.update({"vacancy_name": self.vacancy.name})
         return context
+
+
+class AcceptJobSeeker(View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        pass
+
+
+class RejectJobSeeker(View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
+            user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
+        ).first()
+        if not vacancy_response:
+            return redirect("not_found")
+        vacancy_response.status = VacancyResponse.ResponseStatus.REJECTED
+        vacancy_response.save()
+        return redirect("view_responses", pk=self.kwargs["vacancy_pk"])
