@@ -5,6 +5,7 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
 
 from apps.auth_app.models import JobSeekerProfile, User
+from apps.auth_app.models.models import EmployeeProfile
 from apps.job_board.forms import CompanyForm, CreateVacancyForm, UpdateVacancyForm
 from apps.job_board.models import Company, Vacancy, CompanyOwnership, VacancyResponse
 
@@ -216,7 +217,19 @@ class ResponsesView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 class AcceptJobSeeker(View):
     def post(self, request: WSGIRequest, *args, **kwargs):
-        pass
+        vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
+            user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
+        ).first()
+        if not vacancy_response:
+            return redirect("not_found")
+        vacancy_response.status = VacancyResponse.ResponseStatus.ACCEPTED
+        vacancy_response.vacancy.is_closed = True
+        vacancy_response.user.account_type = User.Types.EMPLOYEE
+        EmployeeProfile.objects.create(
+            user=vacancy_response.user,
+            company=vacancy_response.vacancy.company,
+            position=vacancy_response.vacancy.position
+        )
 
 
 class RejectJobSeeker(View):
