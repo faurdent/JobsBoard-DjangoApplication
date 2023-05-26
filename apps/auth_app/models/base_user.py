@@ -10,6 +10,7 @@ class User(AbstractUser):
         ADMIN = "ADMIN", "Admin"
         JOBSEEKER = "JOBSEEKER", "Job seeker"
         EMPLOYER = "EMPLOYER", "Owner"
+        EMPLOYEE = "EMPLOYEE", "Employee"
 
     base_type = Types.ADMIN
     account_type = models.CharField(max_length=20, choices=Types.choices)
