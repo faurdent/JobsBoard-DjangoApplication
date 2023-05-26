@@ -1,8 +1,7 @@
+from django.db import models
 from django.urls import reverse
 
 from apps.auth_app.models import JobSeekerProfile, EmployerProfile, User
-
-from django.db import models
 
 
 class CompanyOwnership(models.Model):
@@ -35,15 +34,10 @@ class Vacancy(models.Model):
     description = models.TextField()
     position = models.ForeignKey(PositionType, on_delete=models.PROTECT, related_name="position_vacancies")
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="vacancies")
+    is_closed = models.BooleanField(default=False)
 
     def get_absolute_url(self):
         return reverse("vacancy_details", kwargs={"pk": self.pk})
-
-
-class Employee(models.Model):
-    position = models.ForeignKey(PositionType, on_delete=models.PROTECT)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    profile = models.OneToOneField(JobSeekerProfile, on_delete=models.PROTECT)
 
 
 class VacancyResponse(models.Model):
@@ -51,6 +45,7 @@ class VacancyResponse(models.Model):
         PENDING = ("PENDING", "Pending")
         ACCEPTED = ("ACCEPTED", "Accepted")
         REJECTED = ("REJECTED", "Rejected")
+
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="users_responded")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="left_responses")
     status = models.CharField(max_length=10, choices=ResponseStatus.choices, default=ResponseStatus.PENDING)
