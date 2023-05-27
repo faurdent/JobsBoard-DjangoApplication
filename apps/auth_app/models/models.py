@@ -43,6 +43,6 @@ class EmployerProfile(models.Model):
 
 
 class EmployeeProfile(models.Model):
-    position = models.ForeignKey("job_board.PositionType", on_delete=models.PROTECT)
-    company = models.ForeignKey("job_board.Company", on_delete=models.PROTECT)
+    position = models.OneToOneField("job_board.PositionType", on_delete=models.PROTECT)
+    company = models.ForeignKey("job_board.Company", on_delete=models.PROTECT, related_name="employees")
     user = models.OneToOneField(User, on_delete=models.PROTECT)
