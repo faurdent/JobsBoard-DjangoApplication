@@ -17,4 +17,6 @@ urlpatterns = [
     path("change-response-status/<int:pk>", views.VacancyResponseView.as_view(), name="change_response"),
     path("vacancy-responses/<int:pk>", views.ResponsesView.as_view(), name="view_responses"),
     path("reject-response/<int:vacancy_pk>/<int:user_pk>", views.RejectJobSeeker.as_view(), name="reject_jobseeker"),
+    path("accept-response/<int:vacancy_pk>/<int:user_pk>", views.AcceptJobSeeker.as_view(), name="accept_jobseeker"),
+    path("all-employees/<int:pk>", views.AllCompanyEmployeesView.as_view(), name="all_employees"),
 ]
