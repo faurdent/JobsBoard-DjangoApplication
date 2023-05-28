@@ -218,7 +218,7 @@ class ResponsesView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return context
 
 
-class AcceptJobSeeker(View):
+class AcceptJobSeeker(LoginRequiredMixin, View):
     def post(self, request: WSGIRequest, *args, **kwargs):
         vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
             user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
@@ -243,7 +243,7 @@ class AcceptJobSeeker(View):
         vacancy_response.user.save()
 
 
-class RejectJobSeeker(View):
+class RejectJobSeeker(LoginRequiredMixin, View):
     def post(self, request: WSGIRequest, *args, **kwargs):
         vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
             user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
@@ -279,3 +279,14 @@ class AllCompanyEmployeesView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context.update({"company": self.company})
         return context
+
+
+class FireEmployeeView(LoginRequiredMixin, View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        employee = Employee.objects.filter(pk=self.kwargs["user_pk"]).first()
+        if not employee:
+            return redirect("not_found")
+        employee.account_type = User.Types.JOBSEEKER
+        employee.employee_profile.delete()
+        employee.save()
+        return redirect("all_employees", pk=self.kwargs["company_pk"])
