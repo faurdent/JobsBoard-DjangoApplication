@@ -8,6 +8,10 @@
                 <h4>{{ employee_profile.user }}</h4>
             </a>
             <p>{{ employee_profile.position }}</p>
+            <form action="{% url 'fire_employee' company.pk employee_profile.user.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Fire</button>
+            </form>
         {% endfor %}
     </div>
 {% endblock %}
