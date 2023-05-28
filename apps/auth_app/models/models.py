@@ -21,7 +21,7 @@ class Employer(User):
 
 
 class Employee(User):
-    objects = EmployeeManager
+    objects = EmployeeManager()
     base_type = User.Types.EMPLOYEE
 
     class Meta:
@@ -45,4 +45,4 @@ class EmployerProfile(models.Model):
 class EmployeeProfile(models.Model):
     position = models.OneToOneField("job_board.PositionType", on_delete=models.PROTECT)
     company = models.ForeignKey("job_board.Company", on_delete=models.PROTECT, related_name="employees")
-    user = models.OneToOneField(User, on_delete=models.PROTECT)
+    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="employee_profile")
