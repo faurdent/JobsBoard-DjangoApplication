@@ -1,10 +1,16 @@
+from typing import Iterable
+
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import redirect
+from django.core.handlers.wsgi import WSGIRequest
+from django.db import transaction
+from django.shortcuts import redirect, get_object_or_404
+from django.views import View
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
 
 from apps.auth_app.models import JobSeekerProfile, User
+from apps.auth_app.models.models import EmployeeProfile, Employee
 from apps.job_board.forms import CompanyForm, CreateVacancyForm, UpdateVacancyForm
-from apps.job_board.models import Company, Vacancy, CompanyOwnership
+from apps.job_board.models import Company, Vacancy, CompanyOwnership, VacancyResponse
 
 
 class IndexView(TemplateView):
@@ -135,13 +141,37 @@ class DetailVacancy(DetailView):
     template_name = "job_board/detail_vacancy.html"
     context_object_name = "vacancy"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.object = None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object:
+            return redirect("not_found")
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+    def get_object(self, queryset=None):
+        return Vacancy.objects.filter(pk=self.kwargs["pk"], is_closed=False).first()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context.update({
+            "is_responded": False,
+            "can_change_vacancy": False,
+        })
         vacancy: Vacancy = self.object
-        if vacancy.company.owners.filter(user=self.request.user).first():
-            context.update({"can_change_vacancy": True})
-        else:
-            context.update({"can_change_vacancy": False})
+        user: User = self.request.user
+        match user.account_type:
+            case user.Types.JOBSEEKER:
+                context.update({
+                    "is_responded": bool(vacancy.users_responded.filter(user=user).first())
+                })
+            case user.Types.EMPLOYER:
+                context.update({
+                    "can_change_vacancy": bool(vacancy.company.owners.filter(user=self.request.user).first())
+                })
         return context
 
 
@@ -149,6 +179,9 @@ class ViewVacancies(ListView):
     model = Vacancy
     context_object_name = "vacancies"
     template_name = "job_board/view_all_vacancies.html"
+
+    def get_queryset(self):
+        return Vacancy.objects.filter(is_closed=False).all()
 
 
 class EntityNotFoundView(TemplateView):
@@ -158,3 +191,119 @@ class EntityNotFoundView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({"error": "Page not found", "error_message": "You don't have such record."})
         return context
+
+
+class VacancyResponseView(LoginRequiredMixin, View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        vacancy = Vacancy.objects.filter(pk=self.kwargs["pk"]).first()
+        if not vacancy:
+            return redirect("not_found")
+        if existing_response := VacancyResponse.objects.filter(
+                user=request.user, vacancy=vacancy
+        ).first():
+            existing_response.delete()
+        else:
+            vacancy_response = VacancyResponse.objects.create(user=request.user, vacancy=vacancy)
+            vacancy.users_responded.add(vacancy_response)
+        return redirect("vacancy_details", pk=vacancy.pk)
+
+
+class ResponsesView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = VacancyResponse
+    permission_required = "job_board.view_vacancyresponse"
+    context_object_name = "vacancy_responses"
+    template_name = "job_board/view_vacancy_responses.html"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.vacancy = None
+
+    def get(self, request, *args, **kwargs):
+        self.vacancy = get_object_or_404(Vacancy, pk=self.kwargs["pk"])
+        if not CompanyOwnership.objects.filter(
+                company=self.vacancy.company, owner=self.request.user.employer_profile
+        ).first() or self.vacancy.is_closed:
+            return redirect("not_found")
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.vacancy.users_responded.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"vacancy_name": self.vacancy.name})
+        return context
+
+
+class AcceptJobSeeker(LoginRequiredMixin, View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
+            user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
+        ).first()
+        if not vacancy_response:
+            return redirect("not_found")
+        with transaction.atomic():
+            vacancy_response.status = VacancyResponse.ResponseStatus.ACCEPTED
+            vacancy_response.vacancy.is_closed = True
+            vacancy_response.user.account_type = User.Types.EMPLOYEE
+            self._save_related_data(vacancy_response)
+            EmployeeProfile.objects.create(
+                user=vacancy_response.user,
+                company=vacancy_response.vacancy.company,
+                position=vacancy_response.vacancy.position
+            )
+        return redirect("all_employees", pk=vacancy_response.vacancy.company.pk)
+
+    def _save_related_data(self, vacancy_response: VacancyResponse):
+        vacancy_response.save()
+        vacancy_response.vacancy.save()
+        vacancy_response.user.save()
+
+
+class RejectJobSeeker(LoginRequiredMixin, View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
+            user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
+        ).first()
+        if not vacancy_response:
+            return redirect("not_found")
+        vacancy_response.status = VacancyResponse.ResponseStatus.REJECTED
+        vacancy_response.save()
+        return redirect("view_responses", pk=self.kwargs["vacancy_pk"])
+
+
+class AllCompanyEmployeesView(LoginRequiredMixin, ListView):
+    model = Employee
+    template_name = "job_board/view_all_employees.html"
+    context_object_name = "employees"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.company = None
+
+    def get(self, request, *args, **kwargs):
+        self.company = get_object_or_404(Company, pk=self.kwargs["pk"])
+        if not CompanyOwnership.objects.filter(
+                company=self.company, owner=self.request.user.employer_profile
+        ).first():
+            return redirect("not_found")
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self) -> Iterable[EmployeeProfile]:
+        return self.company.employees.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"company": self.company})
+        return context
+
+
+class FireEmployeeView(LoginRequiredMixin, View):
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        employee = Employee.objects.filter(pk=self.kwargs["user_pk"]).first()
+        if not employee:
+            return redirect("not_found")
+        employee.account_type = User.Types.JOBSEEKER
+        employee.employee_profile.delete()
+        employee.save()
+        return redirect("all_employees", pk=self.kwargs["company_pk"])

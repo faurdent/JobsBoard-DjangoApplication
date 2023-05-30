@@ -13,3 +13,9 @@ class EmployerManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs):
         users = super().get_queryset(*args, **kwargs)
         return users.filter(account_type=User.Types.EMPLOYER)
+
+
+class EmployeeManager(BaseUserManager):
+    def get_queryset(self, *args, **kwargs):
+        users = super().get_queryset(*args, **kwargs)
+        return users.filter(account_type=User.Types.EMPLOYEE)
