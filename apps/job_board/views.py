@@ -141,6 +141,20 @@ class DetailVacancy(DetailView):
     template_name = "job_board/detail_vacancy.html"
     context_object_name = "vacancy"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.object = None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object:
+            return redirect("not_found")
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+    def get_object(self, queryset=None):
+        return Vacancy.objects.filter(pk=self.kwargs["pk"], is_closed=False).first()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -165,6 +179,9 @@ class ViewVacancies(ListView):
     model = Vacancy
     context_object_name = "vacancies"
     template_name = "job_board/view_all_vacancies.html"
+
+    def get_queryset(self):
+        return Vacancy.objects.filter(is_closed=False).all()
 
 
 class EntityNotFoundView(TemplateView):
