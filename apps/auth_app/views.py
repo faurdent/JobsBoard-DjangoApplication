@@ -56,4 +56,6 @@ class MyProfileView(ProfileView):
                 context.update({"owned_companies": CompanyOwnership.objects.filter(owner=user.employer_profile).all()})
             case User.Types.JOBSEEKER:
                 context.update({"responses_on_vacancies": VacancyResponse.objects.filter(user=user).all()})
+            case User.Types.EMPLOYEE:
+                context.update({"employee_info": user.employee_profile})
         return context
