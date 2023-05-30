@@ -3,8 +3,10 @@
     <p>{{ object.account_type.capitalize }}</p>
     {% if user_profile.account_type == user.Types.EMPLOYER %}
         {% include "_inc/profiles_info/_employer_account.html" %}
-    {% else %}
+    {% elif user_profile.account_type == user.Types.JOBSEEKER %}
         {% include "_inc/profiles_info/_jobseeker_account.html" %}
+    {% elif user_profile.account_type == user.Types.EMPLOYEE %}
+        {% include "_inc/profiles_info/_employee_profile.html" %}
     {% endif %}
 
 {% endblock %}
