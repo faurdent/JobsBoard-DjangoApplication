@@ -307,3 +307,13 @@ class FireEmployeeView(LoginRequiredMixin, View):
         employee.employee_profile.delete()
         employee.save()
         return redirect("all_employees", pk=self.kwargs["company_pk"])
+
+
+class CompanyVacanciesView(ListView):
+    model = Vacancy
+    template_name = "job_board/company_vacancies.html"
+    context_object_name = "vacancies"
+
+    def get_queryset(self):
+        return Vacancy.objects.filter(company_id=self.kwargs["pk"]).all()
+
