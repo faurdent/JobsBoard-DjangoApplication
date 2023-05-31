@@ -317,3 +317,16 @@ class CompanyVacanciesView(ListView):
     def get_queryset(self):
         return Vacancy.objects.filter(company_id=self.kwargs["pk"]).all()
 
+class EmployerCompaniesView(LoginRequiredMixin, ListView):
+    model = Company
+    context_object_name = "companies"
+    template_name = "job_board/employer_companies.html"
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.account_type != User.Types.EMPLOYER:
+            return redirect("not_found")
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.request.user.employer_profile.companies
+
