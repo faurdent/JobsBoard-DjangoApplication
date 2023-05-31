@@ -24,7 +24,7 @@
     <div>
         <h3>Company vacancies: {{ vacancies_count }}</h3>
         {% if vacancies_count > 0 %}
-            <a href="#">View vacancies</a>
+            <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
         {% else %}
             <p>There is no vacancies yet</p>
         {% endif %}
