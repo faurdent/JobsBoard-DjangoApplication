@@ -335,7 +335,7 @@ class CompanyVacanciesView(CompanyInfoAbstractView):
 class CompanyEmployeesView(CompanyInfoAbstractView):
     model = Employee
     context_object_name = "employees"
-    template_name = "job_board/company_employees.html"
+    template_name = "job_board/view_all_employees.html"
 
     def get_queryset(self):
         return self.company.employees.all()
