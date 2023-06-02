@@ -11,6 +11,7 @@ urlpatterns = [
     path("update-company/<int:pk>", views.UpdateCompany.as_view(), name="update_company"),
     path("create-vacancy", views.CreateVacancy.as_view(), name="create_vacancy"),
     path("detail-vacancy/<int:pk>", views.DetailVacancy.as_view(), name="vacancy_details"),
+    path("delete-company/<int:pk>", views.DeleteCompany.as_view(), name="delete_company"),
     path("errors/404", views.EntityNotFoundView.as_view(), name="not_found"),
     path("update-vacancy/<int:pk>", views.UpdateVacancy.as_view(), name="update_vacancy"),
     path("all-vacancies", views.ViewVacancies.as_view(), name="all_vacancies"),
