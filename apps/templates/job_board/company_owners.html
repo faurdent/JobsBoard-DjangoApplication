@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% block content %}
+    <h1>Owners of {{ company.name }}</h1>
+    <div>
+        <h2>Creator</h2>
+    </div>
+    <div>
+        <h2>Owners</h2>
+        {% for owner_profile in owners %}
+            <h4>{{ owner_profile.user.username }}</h4>
+        {% endfor %}
+    </div>
+{% endblock %}
