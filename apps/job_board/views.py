@@ -2,11 +2,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
+from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView, DeleteView
 
 from apps.auth_app.models import JobSeekerProfile, User
-from apps.auth_app.models.models import EmployeeProfile, Employee
+from apps.auth_app.models.models import EmployeeProfile, Employee, EmployerProfile
 from apps.job_board.forms import CompanyForm, CreateVacancyForm, UpdateVacancyForm
 from apps.job_board.models import Company, Vacancy, CompanyOwnership, VacancyResponse
 
@@ -41,9 +42,12 @@ class CreateCompany(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form: CompanyForm = self.get_form()
+        employer_profile = self.request.user.employer_profile
         if form.is_valid():
             company = form.save()
-            CompanyOwnership.objects.create(company=company, owner=request.user.employer_profile, is_creator=True)
+            employer_profile.has_company = True
+            employer_profile.save()
+            CompanyOwnership.objects.create(company=company, owner=employer_profile, is_creator=True)
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -82,22 +86,34 @@ class DetailCompany(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         company: Company = self.object
-        if self.request.user.account_type != User.Types.EMPLOYER:
-            context.update({"is_company_owner": False})
-        else:
+        context.update({"is_company_owner": False, "is_creator": False})
+        if self.request.user.account_type == User.Types.EMPLOYER:
             employer_profile = self.request.user.employer_profile
-            if employer_profile.companies.filter(
-                    owners__companyownership__company_id=company.pk
+            if ownership := CompanyOwnership.objects.filter(
+                    company=company, owner=employer_profile
             ).first():
-                context.update({"is_company_owner": True})
-            else:
-                context.update({"is_company_owner": False})
+                context.update({"is_company_owner": True, "is_creator": ownership.is_creator})
         context.update({
             "workers_count": company.workers.count(),
             "owners_count": company.owners.count(),
             "vacancies_count": company.vacancies.count(),
         })
         return context
+
+
+class DeleteCompany(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    model = Company
+    permission_required = "job_board.delete_company"
+    success_url = reverse_lazy("my_companies")
+
+    def post(self, request, *args, **kwargs):
+        employer_profile: EmployerProfile = request.user.employer_profile
+        with transaction.atomic():
+            response = super().post(request, *args, **kwargs)
+            if employer_profile.companies.count() == 0:
+                employer_profile.has_company = False
+                employer_profile.save()
+        return response
 
 
 class ViewCompanies(ListView):
@@ -297,7 +313,7 @@ class EmployerCompaniesView(LoginRequiredMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.request.user.employer_profile.companies
+        return self.request.user.employer_profile.companies.all()
 
 
 class CompanyInfoAbstractView(ListView):
@@ -316,10 +332,13 @@ class CompanyInfoAbstractView(ListView):
         context.update(
             {
                 "company": self.company,
-                "is_owner": CompanyOwnership.objects.filter(company=self.company,
-                                                            owner=self.request.user).exists()
             }
         )
+        if self.request.user.account_type == User.Types.EMPLOYER:
+            context.update(
+                {"is_owner": CompanyOwnership.objects.filter(company=self.company,
+                                                             owner=self.request.user.employer_profile).exists()}
+            )
         return context
 
 
