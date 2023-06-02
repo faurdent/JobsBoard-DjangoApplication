@@ -1,0 +1,19 @@
+<nav style="display:flex; justify-content: space-between">
+    <div>
+        <a href="{% if user.account_type == user.Types.EMPLOYER %}
+                    {% url 'employer_home' %}
+                {% else %}
+                    {% url 'home' %}
+                {% endif %}">Home</a>
+        {% if user.account_type == user.Types.EMPLOYER %}
+            {% include "_inc/navbars/_employer_navbar.html" %}
+        {% endif %}
+    </div>
+    <div>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'login' %}">Login</a>
+        {% else %}
+            <a href="{% url 'me' %}">My Profile</a>
+        {% endif %}
+    </div>
+</nav>
