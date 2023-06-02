@@ -32,4 +32,10 @@
     {% if is_company_owner %}
         <a href="{% url 'update_company' company.pk %}">Update Info</a>
     {% endif %}
+    {% if is_creator %}
+        <form action="{% url 'delete_company' company.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+    {% endif %}
 {% endblock %}
