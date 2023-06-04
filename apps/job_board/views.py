@@ -361,12 +361,18 @@ class CompanyEmployeesView(CompanyInfoAbstractView):
 
 
 class CompanyOwnersView(CompanyInfoAbstractView):
-    model = EmployeeProfile
+    model = EmployerProfile
     context_object_name = "owners"
     template_name = "job_board/company_owners.html"
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"creator": self.queryset.filter(has_company=True).first()})
+        return context
+
     def get_queryset(self):
-        return self.company.owners.all()
+        self.queryset = self.company.owners.all()
+        return self.queryset.filter(has_company=False).all()
 
 
 class AddOwnerView(LoginRequiredMixin, CreateView):
