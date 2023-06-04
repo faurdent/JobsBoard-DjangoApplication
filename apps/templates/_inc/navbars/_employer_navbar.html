@@ -1,7 +1,6 @@
 {% if user.employer_profile.has_company %}
-    <a href="{% url 'my_companies' %}">
-        My companies
-    </a>
+    <a href="{% url 'my_companies' %}">My companies</a>
+    <a href="{% url 'create_vacancy' %}">Create vacancy</a>
 {% else %}
     <a href="{% url 'create_company' %}">Create company</a>
 {% endif %}
