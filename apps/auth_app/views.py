@@ -28,21 +28,37 @@ class LoginUserView(LoginView):
     template_name = "auth/_auth_form.html"
 
 
-class ProfileView(LoginRequiredMixin, DetailView):
+class BaseProfileView(LoginRequiredMixin, DetailView):
     model = User
     template_name = "auth/user_detail.html"
     context_object_name = "user_profile"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.object = None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object:
+            return redirect("not_found")
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_object(self, queryset=None):
         username = self.kwargs.get("username")
         queryset: QuerySet[User] = self.get_queryset()
         if user := queryset.filter(username=username).select_related().first():
             return user
-        else:
-            return redirect("not_found")
 
 
-class MyProfileView(ProfileView):
+class ProfileView(BaseProfileView):
+    def get(self, request, *args, **kwargs):
+        if self.kwargs["username"] == request.user.username:
+            return redirect("me")
+        return super().get(request, *args, **kwargs)
+
+
+class MyProfileView(BaseProfileView):
     template_name = "auth/my_profile.html"
 
     def get_object(self, queryset=None):
