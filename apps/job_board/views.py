@@ -195,7 +195,10 @@ class ViewVacancies(ListView):
     template_name = "job_board/view_all_vacancies.html"
 
     def get_queryset(self):
-        return Vacancy.objects.filter(is_closed=False).all()
+        vacancies = Vacancy.objects.filter(is_closed=False)
+        if self.request.GET.get("position-name", ""):
+            return vacancies.filter(name__icontains=self.request.GET.get("position-name")).all()
+        return vacancies.all()
 
 
 class EntityNotFoundView(TemplateView):
