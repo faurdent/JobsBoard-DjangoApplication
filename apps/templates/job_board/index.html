@@ -14,6 +14,10 @@
 {% block content %}
     <h1>For all job seekers</h1>
     <h3>Find vacancies that fit you:</h3>
-    <form></form>
+    <form method="get" action="{% url 'all_vacancies' %}">
+        <label for="position-name">Find a job:</label><br>
+        <input id="position-name" type="text" name="position-name">
+        <button type="submit">Find</button>
+    </form>
     {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
 {% endblock %}
