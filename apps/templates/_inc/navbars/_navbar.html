@@ -7,6 +7,8 @@
                 {% endif %}">Home</a>
         {% if user.account_type == user.Types.EMPLOYER %}
             {% include "_inc/navbars/_employer_navbar.html" %}
+        {% else %}
+            {% include '_inc/navbars/_jobseeker_navbar.html' %}
         {% endif %}
     </div>
     <div>
