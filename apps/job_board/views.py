@@ -94,7 +94,7 @@ class DetailCompany(DetailView):
             ).first():
                 context.update({"is_company_owner": True, "is_creator": ownership.is_creator})
         context.update({
-            "workers_count": company.workers.count(),
+            "workers_count": company.employees.count(),
             "owners_count": company.owners.count(),
             "vacancies_count": company.vacancies.filter(is_closed=False).count(),
         })
@@ -260,18 +260,18 @@ class AcceptJobSeeker(LoginRequiredMixin, View):
         if not vacancy_response:
             return redirect("not_found")
         with transaction.atomic():
-            vacancy_response.status = VacancyResponse.ResponseStatus.ACCEPTED
-            vacancy_response.vacancy.is_closed = True
-            vacancy_response.user.account_type = User.Types.EMPLOYEE
-            self._save_related_data(vacancy_response)
+            self._update_related_data(vacancy_response)
             EmployeeProfile.objects.create(
                 user=vacancy_response.user,
                 company=vacancy_response.vacancy.company,
                 position=vacancy_response.vacancy.position
             )
-        return redirect("all_employees", pk=vacancy_response.vacancy.company.pk)
+        return redirect("company_employees", pk=vacancy_response.vacancy.company.pk)
 
-    def _save_related_data(self, vacancy_response: VacancyResponse):
+    def _update_related_data(self, vacancy_response: VacancyResponse):
+        vacancy_response.status = VacancyResponse.ResponseStatus.ACCEPTED
+        vacancy_response.vacancy.is_closed = True
+        vacancy_response.user.account_type = User.Types.EMPLOYEE
         vacancy_response.save()
         vacancy_response.vacancy.save()
         vacancy_response.user.save()
@@ -302,7 +302,7 @@ class FireEmployeeView(LoginRequiredMixin, View):
         employee.account_type = User.Types.JOBSEEKER
         employee.employee_profile.delete()
         employee.save()
-        return redirect("all_employees", pk=self.kwargs["company_pk"])
+        return redirect("company_employees", pk=self.kwargs["company_pk"])
 
 
 class EmployerCompaniesView(LoginRequiredMixin, ListView):
