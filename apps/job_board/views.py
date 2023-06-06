@@ -18,7 +18,7 @@ class IndexView(TemplateView):
         return {
             "companies_count": Company.objects.all().count(),
             "job_seekers_count": JobSeekerProfile.objects.filter(cv__isnull=True).count(),
-            "vacancies_count": Vacancy.objects.all().count(),
+            "vacancies_count": Vacancy.objects.filter(is_closed=False).count(),
         }
 
 
@@ -96,7 +96,7 @@ class DetailCompany(DetailView):
         context.update({
             "workers_count": company.workers.count(),
             "owners_count": company.owners.count(),
-            "vacancies_count": company.vacancies.count(),
+            "vacancies_count": company.vacancies.filter(is_closed=False).count(),
         })
         return context
 
@@ -196,8 +196,8 @@ class ViewVacancies(ListView):
 
     def get_queryset(self):
         vacancies = Vacancy.objects.filter(is_closed=False)
-        if self.request.GET.get("position-name", ""):
-            return vacancies.filter(name__icontains=self.request.GET.get("position-name")).all()
+        if position_name := self.request.GET.get("position-name", ""):
+            return vacancies.filter(name__icontains=position_name).all()
         return vacancies.all()
 
 
@@ -351,7 +351,7 @@ class CompanyVacanciesView(CompanyInfoAbstractView):
     context_object_name = "vacancies"
 
     def get_queryset(self):
-        return self.company.vacancies.all()
+        return self.company.vacancies.filter(is_closed=False).all()
 
 
 class CompanyEmployeesView(CompanyInfoAbstractView):
