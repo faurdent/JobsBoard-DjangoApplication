@@ -5,6 +5,7 @@
     <p>{{ vacancy.description }}</p>
     {% if can_change_vacancy %}
         <a href="{% url 'update_vacancy' vacancy.pk %}">Update info</a>
+        <a href="{% url 'view_responses' vacancy.pk %}">View responses</a>
     {% endif %}
     {% if user.account_type == user.Types.JOBSEEKER %}
         <form action="{% url 'change_response' vacancy.pk %}" method="post">
