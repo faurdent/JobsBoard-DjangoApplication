@@ -33,7 +33,6 @@ class JobSeekerProfile(models.Model):
     cv = models.FileField(upload_to="cv", blank=True, null=True, default=None)
     jobseeker_id = models.IntegerField(null=True, blank=True)
     skills = models.ManyToManyField("job_board.PositionType")
-    company = models.ForeignKey("job_board.Company", on_delete=models.PROTECT, related_name="workers")
 
 
 class EmployerProfile(models.Model):
@@ -43,6 +42,7 @@ class EmployerProfile(models.Model):
 
 
 class EmployeeProfile(models.Model):
-    position = models.OneToOneField("job_board.PositionType", on_delete=models.PROTECT)
+    position = models.ForeignKey("job_board.PositionType", on_delete=models.PROTECT)
     company = models.ForeignKey("job_board.Company", on_delete=models.PROTECT, related_name="employees")
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name="employee_profile")
+    employee_id = models.IntegerField(null=True, blank=True)

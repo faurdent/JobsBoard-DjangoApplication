@@ -1,0 +1,19 @@
+{% extends "_base.html" %}
+{% block content %}
+    <h1>Owners of {{ company.name }}</h1>
+    <div>
+        <h2>Creator</h2>
+        <a href="{% url 'profile' creator.user.username %}"><h4>{{ creator.user.username }}</h4></a>
+    </div>
+    <div>
+        <h2>Owners</h2>
+    {% if owners %}
+        {% for owner_profile in owners %}
+            <h4>{{ owner_profile.user.username }}</h4>
+        {% endfor %}
+    {% else %}
+        <p>There is no owners except creator yet</p>
+    {% endif %}
+
+    </div>
+{% endblock %}

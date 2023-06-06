@@ -6,14 +6,14 @@
     <ul>
         <li>
             <div>
-                <a href="#">Owners: {{ owners_count }}</a>
+                <a href="{% url 'company_owners' company.pk %}">Owners: {{ owners_count }}</a>
             </div>
         </li>
 
         <li>
             <div>
                 {% if workers_count > 0 %}
-                    <a href="#">Workers: {{ workers_count }}</a>
+                    <a href="{% url 'company_employees' company.pk %}">Workers: {{ workers_count }}</a>
                 {% else %}
                     <p>Workers list is empty</p>
                 {% endif %}
@@ -24,12 +24,18 @@
     <div>
         <h3>Company vacancies: {{ vacancies_count }}</h3>
         {% if vacancies_count > 0 %}
-            <a href="#">View vacancies</a>
+            <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
         {% else %}
             <p>There is no vacancies yet</p>
         {% endif %}
     </div>
     {% if is_company_owner %}
         <a href="{% url 'update_company' company.pk %}">Update Info</a>
+    {% endif %}
+    {% if is_creator %}
+        <form action="{% url 'delete_company' company.pk %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
     {% endif %}
 {% endblock %}

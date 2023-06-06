@@ -1,0 +1,14 @@
+<div>
+    {% if vacancies %}
+        {% for vacancy in vacancies %}
+            <div>
+                <a href="{{ vacancy.get_absolute_url }}"><h3>{{ vacancy.name }}</h3></a>
+                <p>Posted by: {{ vacancy.company }}</p>
+                <p>{{ vacancy.position }}</p>
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <h2>There is no such vacancies</h2>
+    {% endif %}
+</div>

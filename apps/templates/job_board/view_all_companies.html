@@ -1,11 +1,5 @@
 {% extends "_base.html" %}
 {% block content %}
 <h1>All registered companies: </h1>
-    {% for company in companies%}
-        <div>
-            <a href="{{ company.get_absolute_url }}"><h3>{{ company.name }}</h3></a>
-            <p>{{ company.description }}</p>
-            <hr>
-        </div>
-    {% endfor %}
+{% include "_inc/job_board_info/_display_companies.html" %}
 {% endblock %}

@@ -1,14 +1,13 @@
-from typing import Iterable
-
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView
+from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView, DeleteView
 
 from apps.auth_app.models import JobSeekerProfile, User
-from apps.auth_app.models.models import EmployeeProfile, Employee
+from apps.auth_app.models.models import EmployeeProfile, Employee, EmployerProfile
 from apps.job_board.forms import CompanyForm, CreateVacancyForm, UpdateVacancyForm
 from apps.job_board.models import Company, Vacancy, CompanyOwnership, VacancyResponse
 
@@ -19,7 +18,7 @@ class IndexView(TemplateView):
         return {
             "companies_count": Company.objects.all().count(),
             "job_seekers_count": JobSeekerProfile.objects.filter(cv__isnull=True).count(),
-            "vacancies_count": Vacancy.objects.all().count(),
+            "vacancies_count": Vacancy.objects.filter(is_closed=False).count(),
         }
 
 
@@ -43,9 +42,12 @@ class CreateCompany(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form: CompanyForm = self.get_form()
+        employer_profile = self.request.user.employer_profile
         if form.is_valid():
             company = form.save()
-            CompanyOwnership.objects.create(company=company, owner=request.user.employer_profile, is_creator=True)
+            employer_profile.has_company = True
+            employer_profile.save()
+            CompanyOwnership.objects.create(company=company, owner=employer_profile, is_creator=True)
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -84,22 +86,34 @@ class DetailCompany(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         company: Company = self.object
-        if self.request.user.account_type != User.Types.EMPLOYER:
-            context.update({"is_company_owner": False})
-        else:
+        context.update({"is_company_owner": False, "is_creator": False})
+        if self.request.user.account_type == User.Types.EMPLOYER:
             employer_profile = self.request.user.employer_profile
-            if employer_profile.companies.filter(
-                    owners__companyownership__company_id=company.pk
+            if ownership := CompanyOwnership.objects.filter(
+                    company=company, owner=employer_profile
             ).first():
-                context.update({"is_company_owner": True})
-            else:
-                context.update({"is_company_owner": False})
+                context.update({"is_company_owner": True, "is_creator": ownership.is_creator})
         context.update({
-            "workers_count": company.workers.count(),
+            "workers_count": company.employees.count(),
             "owners_count": company.owners.count(),
-            "vacancies_count": company.vacancies.count(),
+            "vacancies_count": company.vacancies.filter(is_closed=False).count(),
         })
         return context
+
+
+class DeleteCompany(PermissionRequiredMixin, LoginRequiredMixin, DeleteView):
+    model = Company
+    permission_required = "job_board.delete_company"
+    success_url = reverse_lazy("my_companies")
+
+    def post(self, request, *args, **kwargs):
+        employer_profile: EmployerProfile = request.user.employer_profile
+        with transaction.atomic():
+            response = super().post(request, *args, **kwargs)
+            if employer_profile.companies.count() == 0:
+                employer_profile.has_company = False
+                employer_profile.save()
+        return response
 
 
 class ViewCompanies(ListView):
@@ -181,7 +195,10 @@ class ViewVacancies(ListView):
     template_name = "job_board/view_all_vacancies.html"
 
     def get_queryset(self):
-        return Vacancy.objects.filter(is_closed=False).all()
+        vacancies = Vacancy.objects.filter(is_closed=False)
+        if position_name := self.request.GET.get("position-name", ""):
+            return vacancies.filter(name__icontains=position_name).all()
+        return vacancies.all()
 
 
 class EntityNotFoundView(TemplateView):
@@ -243,18 +260,18 @@ class AcceptJobSeeker(LoginRequiredMixin, View):
         if not vacancy_response:
             return redirect("not_found")
         with transaction.atomic():
-            vacancy_response.status = VacancyResponse.ResponseStatus.ACCEPTED
-            vacancy_response.vacancy.is_closed = True
-            vacancy_response.user.account_type = User.Types.EMPLOYEE
-            self._save_related_data(vacancy_response)
+            self._update_related_data(vacancy_response)
             EmployeeProfile.objects.create(
                 user=vacancy_response.user,
                 company=vacancy_response.vacancy.company,
                 position=vacancy_response.vacancy.position
             )
-        return redirect("all_employees", pk=vacancy_response.vacancy.company.pk)
+        return redirect("company_employees", pk=vacancy_response.vacancy.company.pk)
 
-    def _save_related_data(self, vacancy_response: VacancyResponse):
+    def _update_related_data(self, vacancy_response: VacancyResponse):
+        vacancy_response.status = VacancyResponse.ResponseStatus.ACCEPTED
+        vacancy_response.vacancy.is_closed = True
+        vacancy_response.user.account_type = User.Types.EMPLOYEE
         vacancy_response.save()
         vacancy_response.vacancy.save()
         vacancy_response.user.save()
@@ -271,27 +288,6 @@ class RejectJobSeeker(LoginRequiredMixin, View):
         vacancy_response.save()
         return redirect("view_responses", pk=self.kwargs["vacancy_pk"])
 
-
-class AllCompanyEmployeesView(LoginRequiredMixin, ListView):
-    model = Employee
-    template_name = "job_board/view_all_employees.html"
-    context_object_name = "employees"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.company = None
-
-    def get(self, request, *args, **kwargs):
-        self.company = get_object_or_404(Company, pk=self.kwargs["pk"])
-        if not CompanyOwnership.objects.filter(
-                company=self.company, owner=self.request.user.employer_profile
-        ).first():
-            return redirect("not_found")
-        return super().get(request, *args, **kwargs)
-
-    def get_queryset(self) -> Iterable[EmployeeProfile]:
-        return self.company.employees.all()
-
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({"company": self.company})
@@ -306,4 +302,81 @@ class FireEmployeeView(LoginRequiredMixin, View):
         employee.account_type = User.Types.JOBSEEKER
         employee.employee_profile.delete()
         employee.save()
-        return redirect("all_employees", pk=self.kwargs["company_pk"])
+        return redirect("company_employees", pk=self.kwargs["company_pk"])
+
+
+class EmployerCompaniesView(LoginRequiredMixin, ListView):
+    model = Company
+    context_object_name = "companies"
+    template_name = "job_board/employer_companies.html"
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.account_type != User.Types.EMPLOYER:
+            return redirect("not_found")
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.request.user.employer_profile.companies.all()
+
+
+class CompanyInfoAbstractView(ListView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.company = None
+
+    def get(self, request, *args, **kwargs):
+        self.company = Company.objects.filter(pk=self.kwargs["pk"]).first()
+        if not self.company:
+            return redirect("not_found")
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "company": self.company,
+            }
+        )
+        if self.request.user.account_type == User.Types.EMPLOYER:
+            context.update(
+                {"is_owner": CompanyOwnership.objects.filter(company=self.company,
+                                                             owner=self.request.user.employer_profile).exists()}
+            )
+        return context
+
+
+class CompanyVacanciesView(CompanyInfoAbstractView):
+    model = Vacancy
+    template_name = "job_board/company_vacancies.html"
+    context_object_name = "vacancies"
+
+    def get_queryset(self):
+        return self.company.vacancies.filter(is_closed=False).all()
+
+
+class CompanyEmployeesView(CompanyInfoAbstractView):
+    model = Employee
+    context_object_name = "employees"
+    template_name = "job_board/view_all_employees.html"
+
+    def get_queryset(self):
+        return self.company.employees.all()
+
+
+class CompanyOwnersView(CompanyInfoAbstractView):
+    model = EmployerProfile
+    context_object_name = "owners"
+    template_name = "job_board/company_owners.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"creator": self.queryset.filter(has_company=True).first()})
+        return context
+
+    def get_queryset(self):
+        self.queryset = self.company.owners.all()
+        return self.queryset.filter(has_company=False).all()
+
+
+class AddOwnerView(LoginRequiredMixin, CreateView):
+    model = CompanyOwnership
