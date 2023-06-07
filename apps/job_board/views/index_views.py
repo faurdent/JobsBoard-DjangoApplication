@@ -1,9 +1,9 @@
-from apps.job_board.views.modificated_views import IndexView
+from apps.job_board.views.modificated_views import IndexAbstractView
 
 
-class IndexJobSeekerView(IndexView):
+class IndexJobSeekerView(IndexAbstractView):
     template_name = "job_board/index.html"
 
 
-class IndexEmployerView(IndexView):
+class IndexEmployerView(IndexAbstractView):
     template_name = "job_board/index_employer.html"
