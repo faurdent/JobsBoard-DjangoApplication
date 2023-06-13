@@ -67,7 +67,7 @@ class DetailCompany(DetailView):
         company: Company = self.object
         user: User = self.request.user
         context.update({"is_company_owner": False, "is_creator": False})
-        if user.account_type == User.Types.EMPLOYER:
+        if user.is_authenticated and user.account_type == User.Types.EMPLOYER:
             employer_profile = self.request.user.employer_profile
             if ownership := CompanyOwnership.objects.filter(
                     company=company, owner=employer_profile

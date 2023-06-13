@@ -62,6 +62,8 @@ class DetailVacancy(DetailView):
         })
         vacancy: Vacancy = self.object
         user: User = self.request.user
+        if not user.is_authenticated:
+            return context
         match user.account_type:
             case user.Types.JOBSEEKER:
                 context.update({

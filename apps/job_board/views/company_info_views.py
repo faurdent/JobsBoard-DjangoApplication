@@ -47,7 +47,8 @@ class EmployerCompaniesView(LoginRequiredMixin, ListView):
     template_name = "job_board/employer_companies.html"
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.account_type != User.Types.EMPLOYER:
+        user = request.user
+        if user.is_authenticated and user != User.Types.EMPLOYER:
             return redirect("not_found")
         return super().get(request, *args, **kwargs)
 
