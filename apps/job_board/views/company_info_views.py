@@ -48,7 +48,7 @@ class EmployerCompaniesView(LoginRequiredMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        if user.is_authenticated and user != User.Types.EMPLOYER:
+        if user.is_authenticated and user.account_type != User.Types.EMPLOYER:
             return redirect("not_found")
         return super().get(request, *args, **kwargs)
 
