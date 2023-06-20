@@ -1,12 +1,23 @@
 {% extends "_base.html" %}
 {% block title %}Find a job{% endblock %}
 {% block content %}
-    <h1>For all job seekers</h1>
-    <h3>Find vacancies that fit you:</h3>
-    <form method="get" action="{% url 'all_vacancies' %}">
-        <label for="position-name">Find a job:</label><br>
-        <input id="position-name" type="text" name="position-name">
-        <button type="submit">Find</button>
-    </form>
-    {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+    <div class="container">
+        <div class="d-flex flex-column align-items-center">
+            <div class="my-3">
+                <h1>For all job seekers</h1>
+            </div>
+            <div class="col-md-10">
+                <form class="d-flex" method="get" action="{% url 'all_vacancies' %}">
+                    <div class="col-md-9 me-5">
+                        <input class="form-control" type="text" name="position-name"
+                               placeholder="What job do you want?">
+                    </div>
+                    <div class="d-grid col-md-2">
+                        <button class="btn btn-primary " type="submit">Find</button>
+                    </div>
+                </form>
+                {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
