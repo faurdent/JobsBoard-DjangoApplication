@@ -42,7 +42,7 @@ class Vacancy(models.Model):
         return reverse("vacancy_details", kwargs={"pk": self.pk})
 
     class Meta:
-        ordering = ["created_at"]
+        ordering = ["-created_at"]
 
 
 class VacancyResponse(models.Model):
