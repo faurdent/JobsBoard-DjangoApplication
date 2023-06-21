@@ -23,11 +23,14 @@
     </ul>
     <div>
         <h3>Company vacancies: {{ vacancies_count }}</h3>
-        {% if vacancies_count > 0 %}
-            <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
-        {% else %}
-            <p>There is no vacancies yet</p>
-        {% endif %}
+        <div>
+            {% if vacancies_count > 0 %}
+                <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
+            {% else %}
+                <p>There is no vacancies yet</p>
+                <a href="{% url 'create_vacancy' %}">Create one</a>
+            {% endif %}
+        </div>
     </div>
     {% if is_company_owner %}
         <a href="{% url 'update_company' company.pk %}">Update Info</a>
