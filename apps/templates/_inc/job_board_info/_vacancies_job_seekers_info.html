@@ -1,5 +1,6 @@
 <div class="d-flex justify-content-center mt-3">
-    <p>{{ vacancies_count }} vacancies from {{ companies_count }} companies</p>
-    <div class="mx-4">|</div>
-    <p>{{ job_seekers_count }} candidates who uploaded their CV</p>
+{#    TODO: Add media query for wrapping #}
+    <p class="flex-md-column" >{{ vacancies_count }} vacancies from {{ companies_count }} companies</p>
+    <div class="mx-4 flex-md-column flex-shrink-0">|</div>
+    <p class="flex-md-column">{{ job_seekers_count }} candidates who uploaded their CV</p>
 </div>
