@@ -15,6 +15,10 @@ class CreateCompany(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_required = "job_board.add_company"
     model = Company
 
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect("register_employer")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.object = None
