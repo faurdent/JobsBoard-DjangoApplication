@@ -1,17 +1,23 @@
 {% extends "_base.html" %}
 {% block title %}Publish vacancies. Find employees{% endblock %}
 {% block content %}
-    <h1>For employers</h1>
-    {% if user.is_authenticated and user.account_type == user.Types.EMPLOYER %}
-        {% if user.employee_profile.has_company %}
-            <a href="#">Publish vacancies</a>
-        {% else %}
-            <a href="{% url 'create_company' %}">Create your company account</a>
-        {% endif %}
-    {% endif %}
-    {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
-    <h2>Find candidate:</h2>
-    <form>
-
-    </form>
+    <div class="container">
+        <div>
+            <div class="my-3">
+                <h1 class="text-center">For all employers</h1>
+            </div>
+            <div>
+                <div class="col-md text-center">
+                    {% if user.Types.EMPLOYER and user.employee_profile.has_company %}
+                        <a class="btn btn-primary col-md-5" href="{% url 'create_vacancy' %}" role="button">Publish
+                            vacancy</a>
+                    {% else %}
+                        <a class="btn btn-primary col-md-5" href="{% url 'create_company' %}">Create your company
+                            account</a>
+                    {% endif %}
+                </div>
+                {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
