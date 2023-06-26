@@ -10,8 +10,13 @@ from apps.job_board.views.modificated_views import CompanyInfoAbstractView
 
 class CompanyVacanciesView(CompanyInfoAbstractView):
     model = Vacancy
-    template_name = "job_board/company_vacancies.html"
+    template_name = "job_board/view_vacancies.html"
     context_object_name = "vacancies"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"vacancies_info_title": f"Vacancies posted by {self.company.name}"})
+        return context
 
     def get_queryset(self):
         return self.company.vacancies.filter(is_closed=False).all()

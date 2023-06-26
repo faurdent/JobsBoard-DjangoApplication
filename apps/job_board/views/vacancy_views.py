@@ -79,7 +79,12 @@ class DetailVacancy(DetailView):
 class ViewVacancies(ListView):
     model = Vacancy
     context_object_name = "vacancies"
-    template_name = "job_board/view_all_vacancies.html"
+    template_name = "job_board/view_vacancies.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"vacancies_info_list": "Vacancies"})
+        return context
 
     def get_queryset(self):
         vacancies = Vacancy.objects.filter(is_closed=False)
