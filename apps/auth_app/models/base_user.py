@@ -2,16 +2,23 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 
+from apps.services import ImagePathsGenerator
+
 
 class User(AbstractUser):
-    email = models.EmailField(blank=False)
-
     class Types(models.TextChoices):
         ADMIN = "ADMIN", "Admin"
         JOBSEEKER = "JOBSEEKER", "Job seeker"
         EMPLOYER = "EMPLOYER", "Owner"
         EMPLOYEE = "EMPLOYEE", "Employee"
 
+    email = models.EmailField(blank=False)
+    avatar = models.ImageField(
+        max_length=255,
+        null=True,
+        blank=True,
+        upload_to=ImagePathsGenerator.get_avatar_path_user,
+    )
     base_type = Types.ADMIN
     account_type = models.CharField(max_length=20, choices=Types.choices)
 
