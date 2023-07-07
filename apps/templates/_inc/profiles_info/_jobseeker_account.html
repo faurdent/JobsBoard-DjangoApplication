@@ -8,4 +8,11 @@
             <p>{{ response.status.capitalize }}</p>
         {% endfor %}
     {% endif %}
+    {% if not user.jobseeker_profile.cv %}
+        <form action="#" method="post">
+            {% csrf_token %}
+            <label for="cv-input">Upload your CV</label>
+            <input id="cv-input" type="file">
+        </form>
+    {% endif %}
 </div>

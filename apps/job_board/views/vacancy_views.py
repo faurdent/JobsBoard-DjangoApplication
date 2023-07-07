@@ -62,6 +62,8 @@ class DetailVacancy(DetailView):
         })
         vacancy: Vacancy = self.object
         user: User = self.request.user
+        if not user.is_authenticated:
+            return context
         match user.account_type:
             case user.Types.JOBSEEKER:
                 context.update({
@@ -77,7 +79,12 @@ class DetailVacancy(DetailView):
 class ViewVacancies(ListView):
     model = Vacancy
     context_object_name = "vacancies"
-    template_name = "job_board/view_all_vacancies.html"
+    template_name = "job_board/view_vacancies.html"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"vacancies_info_title": "Vacancies"})
+        return context
 
     def get_queryset(self):
         vacancies = Vacancy.objects.filter(is_closed=False)

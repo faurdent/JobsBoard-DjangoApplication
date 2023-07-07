@@ -1,12 +1,38 @@
 {% extends "_base.html" %}
 {% block title %}Find a job{% endblock %}
 {% block content %}
-    <h1>For all job seekers</h1>
-    <h3>Find vacancies that fit you:</h3>
-    <form method="get" action="{% url 'all_vacancies' %}">
-        <label for="position-name">Find a job:</label><br>
-        <input id="position-name" type="text" name="position-name">
-        <button type="submit">Find</button>
-    </form>
-    {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+    <div class="container">
+        <div>
+            <div class="my-3">
+                <h1 class="text-center">For all job seekers</h1>
+            </div>
+            <div class="col-md">
+                <form class="d-flex justify-content-center justify-content-sm-start" method="get"
+                      action="{% url 'all_vacancies' %}">
+                    <div class="col-sm-9 me-5">
+                        <input class="form-control" type="text" name="position-name"
+                               placeholder="What job do you want?">
+                    </div>
+                    <div class="d-grid col-sm-2">
+                        <button class="btn btn-primary" type="submit">Find</button>
+                    </div>
+                </form>
+                {% include "_inc/job_board_info/_vacancies_job_seekers_info.html" %}
+            </div>
+        </div>
+
+        <div class="col mt-3">
+            {% if latest_vacancies %}
+                <h3>See the newest vacancies:</h3>
+                <div class="d-flex justify-content-lg-between justify-content-center flex-lg-row flex-column col-md-9">
+                    {% for vacancy in latest_vacancies %}
+                        <div class="card mx-2 my-3" style="width: 18rem">
+                            {% include "_inc/cards/_vacancy_card_body.html" %}
+                            {% include "_inc/cards/_vacancy_card_footer.html" %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

@@ -1,7 +1,8 @@
 {% for company in companies %}
-    <div>
-        <a href="{{ company.get_absolute_url }}"><h3>{{ company.name }}</h3></a>
-        <p>{{ company.description }}</p>
-        <hr>
+    <div class="card col-md-9 mt-4">
+        <div class="card-body">
+            <h5 class="card-title"><a href="{{ company.get_absolute_url }}">{{ company.name }}</a></h5>
+            <p class="card-text">{{ company.description }}</p>
+        </div>
     </div>
 {% endfor %}

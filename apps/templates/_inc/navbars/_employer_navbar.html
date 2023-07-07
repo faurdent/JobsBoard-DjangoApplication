@@ -1,7 +1,4 @@
-{% if user.employer_profile.has_company %}
-    <a href="{% url 'my_companies' %}">My companies</a>
-    <a href="{% url 'create_vacancy' %}">Create vacancy</a>
-{% else %}
-    <a href="{% url 'create_company' %}">Create company</a>
-{% endif %}
-<a href="{% url 'home' %}">Job seekers</a>
+<li class="nav-item"><a class="nav-link" href="{% url 'my_companies' %}">My companies</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'create_vacancy' %}">Create vacancy</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'create_company' %}">Create company</a></li>
+

@@ -35,9 +35,14 @@ class Vacancy(models.Model):
     position = models.ForeignKey(PositionType, on_delete=models.PROTECT, related_name="position_vacancies")
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="vacancies")
     is_closed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
         return reverse("vacancy_details", kwargs={"pk": self.pk})
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class VacancyResponse(models.Model):
