@@ -1,3 +1,4 @@
+{% load static %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
         <a class="navbar-brand" href="{% if user.account_type == user.Types.EMPLOYER %}
@@ -27,7 +28,18 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'register_jobseeker' %}">Register</a></li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'me' %}">My Profile</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'me' %}">
+                            {% if user.avatar %}
+                                <img style="width: 3em;" class="rounded-circle"
+                                     src="{{ user.avatar.url }}" alt="avatar">
+                            {% else %}
+                                <img style="width: 3em;" class="rounded-circle"
+                                     src="{% static 'images/blank_profile_avatar.jpg' %}" alt="avatar">
+                            {% endif %}
+
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
         </div>
