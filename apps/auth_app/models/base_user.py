@@ -17,7 +17,7 @@ class User(AbstractUser):
         max_length=255,
         null=True,
         blank=True,
-        upload_to=ImagePathsGenerator.get_avatar_path_user,
+        upload_to=ImagePathsGenerator.get_user_avatar_path,
     )
     base_type = Types.ADMIN
     account_type = models.CharField(max_length=20, choices=Types.choices)
