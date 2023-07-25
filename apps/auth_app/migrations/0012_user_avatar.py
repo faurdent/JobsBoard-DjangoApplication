@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='avatar',
-            field=models.ImageField(blank=True, max_length=255, null=True, upload_to=apps.services.image_paths.ImagePathsGenerator.get_avatar_path_user),
+            field=models.ImageField(blank=True, max_length=255, null=True, upload_to=apps.services.image_paths.ImagePathsGenerator.get_user_avatar_path),
         ),
     ]
