@@ -1,44 +1,63 @@
 {% extends "_base.html" %}
+{% load static %}
 {% block title %}Company | {{ company.name }}{% endblock %}
 {% block content %}
-    <h1>{{ company.name }}</h1>
-    <p>{{ company.description }}</p>
-    <ul>
-        <li>
+    <div class="container mt-4">
+        <div class="d-flex">
             <div>
-                <a href="{% url 'company_owners' company.pk %}">Owners: {{ owners_count }}</a>
-            </div>
-        </li>
-
-        <li>
-            <div>
-                {% if workers_count > 0 %}
-                    <a href="{% url 'company_employees' company.pk %}">Workers: {{ workers_count }}</a>
+                {% if company.logo %}
+                    <img style="width: 7em;" src="{% static company.logo.url %}" alt="company-logo">
                 {% else %}
-                    <p>Workers list is empty</p>
+                    <img style="width: 7em;" src="{% static 'images/empty_company_logo.png' %}" alt="company-logo">
                 {% endif %}
-
             </div>
-        </li>
-    </ul>
-    <div>
-        <h3>Company vacancies: {{ vacancies_count }}</h3>
-        <div>
-            {% if vacancies_count > 0 %}
-                <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
-            {% else %}
-                <p>There is no vacancies yet</p>
-                <a href="{% url 'create_vacancy' %}">Create one</a>
-            {% endif %}
+            <div class="ms-4 mt-2">
+                <h1>{{ company.name }}</h1>
+                <p>{{ company.description }}</p>
+            </div>
         </div>
+        <div>
+            <ul>
+                <li>
+                    <div>
+                        <a href="{% url 'company_owners' company.pk %}">Owners: {{ owners_count }}</a>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        {% if workers_count > 0 %}
+                            <a href="{% url 'company_employees' company.pk %}">Workers: {{ workers_count }}</a>
+                        {% else %}
+                            <p>Workers list is empty</p>
+                        {% endif %}
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <h3>Company vacancies: {{ vacancies_count }}</h3>
+            <div>
+                {% if vacancies_count > 0 %}
+                    <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
+                {% else %}
+                    <p>There is no vacancies yet</p>
+
+                {% endif %}
+                {% if is_company_owner %}
+                    <a href="{% url 'create_vacancy' %}">Create one</a>
+                {% endif %}
+            </div>
+        </div>
+        {% if is_company_owner %}
+            <a href="{% url 'update_company' company.pk %}">Update Info</a>
+        {% endif %}
+        {% if is_creator %}
+            <form action="{% url 'delete_company' company.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+            </form>
+        {% endif %}
     </div>
-    {% if is_company_owner %}
-        <a href="{% url 'update_company' company.pk %}">Update Info</a>
-    {% endif %}
-    {% if is_creator %}
-        <form action="{% url 'delete_company' company.pk %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Delete</button>
-        </form>
-    {% endif %}
 {% endblock %}
