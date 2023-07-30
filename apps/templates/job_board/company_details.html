@@ -16,8 +16,9 @@
                 <p>{{ company.description }}</p>
             </div>
         </div>
-        <div>
-            <ul>
+        <div class="mt-4">
+            <h2>Owners and employees</h2>
+            <ul class="fs-5" style="list-style: none;">
                 <li>
                     <div>
                         <a href="{% url 'company_owners' company.pk %}">Owners: {{ owners_count }}</a>
@@ -37,27 +38,26 @@
             </ul>
         </div>
         <div>
-            <h3>Company vacancies: {{ vacancies_count }}</h3>
-            <div>
+            <h2>Latest vacancies</h2>
+            <div class="px-2">
+                {% include "_inc/job_board_info/_display_latest_vacancies.html" %}
                 {% if vacancies_count > 0 %}
-                    <a href="{% url 'company_vacancies' company.pk %}">View vacancies</a>
+                    <a href="{% url 'company_vacancies' company.pk %}">View all vacancies</a>
                 {% else %}
                     <p>There is no vacancies yet</p>
-
-                {% endif %}
-                {% if is_company_owner %}
-                    <a href="{% url 'create_vacancy' %}">Create one</a>
                 {% endif %}
             </div>
         </div>
-        {% if is_company_owner %}
-            <a href="{% url 'update_company' company.pk %}">Update Info</a>
-        {% endif %}
-        {% if is_creator %}
-            <form action="{% url 'delete_company' company.pk %}" method="post">
-                {% csrf_token %}
-                <button type="submit">Delete</button>
-            </form>
-        {% endif %}
+        <div class="d-flex justify-content-end ms-2 mt-5">
+            {% if is_company_owner %}
+                <a class="btn btn-outline-primary me-3" href="{% url 'update_company' company.pk %}">Update Info</a>
+            {% endif %}
+            {% if is_creator %}
+                <form action="{% url 'delete_company' company.pk %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
