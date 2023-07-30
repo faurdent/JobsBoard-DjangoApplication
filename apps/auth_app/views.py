@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 
-from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm
+from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm, LoginForm
 from apps.auth_app.models import JobSeeker, Employer, User
 from apps.job_board.models import CompanyOwnership, VacancyResponse
 
@@ -25,7 +25,8 @@ class JobSeekerSignUpView(CreateView):
 
 
 class LoginUserView(LoginView):
-    template_name = "auth/_auth_form.html"
+    template_name = "auth/login_form.html"
+    form_class = LoginForm
 
 
 class BaseProfileView(LoginRequiredMixin, DetailView):
