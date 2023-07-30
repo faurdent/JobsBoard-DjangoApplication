@@ -1,0 +1,8 @@
+<div class="d-flex justify-content-lg-between justify-content-center flex-lg-row flex-column col-md-9">
+    {% for vacancy in latest_vacancies %}
+        <div class="card my-3" style="width: 18rem">
+            {% include "_inc/cards/_vacancy_card_body.html" %}
+            {% include "_inc/cards/_vacancy_card_footer.html" %}
+        </div>
+    {% endfor %}
+</div>
