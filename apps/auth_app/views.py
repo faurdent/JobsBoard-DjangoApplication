@@ -70,7 +70,11 @@ class MyProfileView(BaseProfileView):
         user: User = self.request.user
         match user.account_type:
             case User.Types.EMPLOYER:
-                context.update({"owned_companies": CompanyOwnership.objects.filter(owner=user.employer_profile).all()})
+                owned_companies = CompanyOwnership.objects.filter(owner=user.employer_profile)
+                context.update({
+                    "owned_companies": owned_companies.filter(is_creator=False).all(),
+                    "created_companies": owned_companies.filter(is_creator=True).all()
+                })
             case User.Types.JOBSEEKER:
                 context.update({"responses_on_vacancies": VacancyResponse.objects.filter(user=user).all()})
             case User.Types.EMPLOYEE:
