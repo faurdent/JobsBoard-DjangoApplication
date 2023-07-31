@@ -13,6 +13,7 @@ class User(AbstractUser):
         EMPLOYEE = "EMPLOYEE", "Employee"
 
     email = models.EmailField(blank=False)
+    bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(
         max_length=255,
         null=True,
