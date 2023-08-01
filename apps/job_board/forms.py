@@ -7,10 +7,11 @@ from apps.job_board.models import Company, Vacancy
 class CompanyForm(forms.ModelForm):
     class Meta:
         model = Company
-        fields = ("name", "description")
+        fields = ("name", "description", "logo")
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control"}),
+            "logo": forms.FileInput(attrs={"class": "form-control"}),
         }
 
 
