@@ -1,12 +1,31 @@
 {% extends "_base.html" %}
-{% block content %}<h1>{{ object.username }}</h1>
-    <p>{{ object.account_type.capitalize }}</p>
-    {% if user_profile.account_type == user.Types.EMPLOYER %}
-        {% include "_inc/profiles_info/_employer_account.html" %}
-    {% elif user_profile.account_type == user.Types.JOBSEEKER %}
-        {% include "_inc/profiles_info/_jobseeker_account.html" %}
-    {% elif user_profile.account_type == user.Types.EMPLOYEE %}
-        {% include "_inc/profiles_info/_employee_profile.html" %}
-    {% endif %}
-
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col-2 mt-1" style="min-width: 4.5em">
+                <img class="img-fluid rounded-circle" src="{% static 'images/blank_profile_avatar.jpg' %}" alt="avatar">
+            </div>
+            <div class="col-9">
+                <h1>{{ object.username }}</h1>
+                <p>{{ object.account_type.capitalize }}</p>
+                <div class="card">
+                    <div class="card-body">
+                        {% if object.bio %}
+                            <p>{{ object.bio }}</p>
+                        {% else %}
+                            <p>There is no bio yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if user_profile.account_type == user.Types.EMPLOYER %}
+            {% include "_inc/profiles_info/_employer_account.html" %}
+        {% elif user_profile.account_type == user.Types.JOBSEEKER %}
+            {% include "_inc/profiles_info/_jobseeker_account.html" %}
+        {% elif user_profile.account_type == user.Types.EMPLOYEE %}
+            {% include "_inc/profiles_info/_employee_profile.html" %}
+        {% endif %}
+    </div>
 {% endblock %}
