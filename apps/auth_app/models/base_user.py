@@ -30,3 +30,4 @@ class User(AbstractUser):
         if not self.pk:
             self.account_type = self.base_type
             return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
