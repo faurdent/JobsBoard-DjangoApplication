@@ -1,20 +1,4 @@
 {% load static %}
 {% for company in companies %}
-    <div class="card col-md-9 mt-4">
-        <div class="card-body">
-            <div class="d-flex">
-                <div class="me-3">
-                    {% if company.logo %}
-                        <img style="width: 4em" src="{{ company.logo.url }}" alt="company logo">
-                    {% else %}
-                        <img style="width: 4em" src="{% static 'images/empty_company_logo.png' %}" alt="company logo">
-                    {% endif %}
-                </div>
-                <div>
-                    <h5 class="card-title"><a href="{{ company.get_absolute_url }}">{{ company.name }}</a></h5>
-                    <p class="card-text">{{ company.description|truncatewords:40 }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include '_inc/job_board_info/_company_card.html' %}
 {% endfor %}
