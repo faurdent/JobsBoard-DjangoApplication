@@ -6,7 +6,7 @@
             <div class="col-2 mt-1" style="min-width: 4.5em">
                 <img class="img-fluid rounded-circle" src="{% static 'images/blank_profile_avatar.jpg' %}" alt="avatar">
             </div>
-            <div class="col-9">
+            <div class="col-10">
                 <h1>{{ object.username }}</h1>
                 <p>{{ object.account_type.capitalize }}</p>
                 <div class="card">
@@ -18,6 +18,10 @@
                         {% endif %}
                     </div>
                 </div>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+                <a class="btn btn-primary" href="{% url 'update-profile' %}">Update info</a>
+                <a href="#" class="btn btn-danger ms-3">Delete</a>
             </div>
         </div>
         {% if user_profile.account_type == user.Types.EMPLOYER %}
