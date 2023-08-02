@@ -3,9 +3,9 @@ from django.contrib.auth.views import LoginView
 from django.db.models import QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView
 
-from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm, LoginForm
+from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm, LoginForm, UpdateProfileForm
 from apps.auth_app.models import JobSeeker, Employer, User
 from apps.job_board.models import CompanyOwnership, VacancyResponse
 
@@ -80,3 +80,12 @@ class MyProfileView(BaseProfileView):
             case User.Types.EMPLOYEE:
                 context.update({"employee_info": user.employee_profile})
         return context
+
+
+class UpdateProfile(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UpdateProfileForm
+    template_name = "auth/update_profile.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
