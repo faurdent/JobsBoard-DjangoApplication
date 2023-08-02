@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from apps.auth_app.models import Employer, JobSeeker
+from apps.auth_app.models import Employer, JobSeeker, User
 
 
 class LoginForm(AuthenticationForm):
@@ -31,10 +31,11 @@ class BaseUserCreationForm(UserCreationForm):
     )
 
     class Meta:
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2', "avatar")
         widgets = {
             "username": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "avatar": forms.FileInput(attrs={"class": "form-control"}),
         }
 
 
@@ -53,3 +54,14 @@ class SignUpEmployerForm(BaseUserCreationForm):
 class SignUpJobSeekerForm(BaseUserCreationForm):
     class Meta(BaseUserCreationForm.Meta):
         model = JobSeeker
+
+
+class UpdateProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ("username", "bio", "avatar")
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-control", "autofocus": True}),
+            "bio": forms.Textarea(attrs={"class": "form-control"}),
+            "avatar": forms.FileInput(attrs={"class": "form-control"}),
+        }
