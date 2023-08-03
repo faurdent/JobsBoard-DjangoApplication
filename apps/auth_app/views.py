@@ -31,7 +31,7 @@ class LoginUserView(LoginView):
 
 class BaseProfileView(LoginRequiredMixin, DetailView):
     model = User
-    template_name = "auth/user_detail.html"
+    template_name = "auth/user_profile.html"
     context_object_name = "user_profile"
 
     def __init__(self, *args, **kwargs):

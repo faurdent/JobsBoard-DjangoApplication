@@ -3,22 +3,7 @@
 {% block content %}
     <div class="container">
         <div class="row mt-4">
-            <div class="col-2 mt-1" style="min-width: 4.5em">
-                <img class="img-fluid rounded-circle" src="{% static 'images/blank_profile_avatar.jpg' %}" alt="avatar">
-            </div>
-            <div class="col-10">
-                <h1>{{ object.username }}</h1>
-                <p>{{ object.account_type.capitalize }}</p>
-                <div class="card">
-                    <div class="card-body">
-                        {% if object.bio %}
-                            <p>{{ object.bio }}</p>
-                        {% else %}
-                            <p>There is no bio yet.</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            {% include '_inc/profiles_info/_common_profile_info.html' %}
             <div class="d-flex justify-content-end mt-3">
                 <a class="btn btn-primary" href="{% url 'update-profile' %}">Update info</a>
                 <a href="#" class="btn btn-danger ms-3">Delete</a>
