@@ -1,23 +1,41 @@
 {% extends "_base.html" %}
+{% block title %}
+	{{ vacancy.name }}
+{% endblock %}
 {% block content %}
-    <h1>{{ vacancy.name }}</h1>
-    <h4>Posted by: <a href="{{ vacancy.company.get_absolute_url }}">{{ vacancy.company.name }}</a></h4>
-    <p>{{ vacancy.description }}</p>
-    {% if can_change_vacancy %}
-        <a href="{% url 'update_vacancy' vacancy.pk %}">Update info</a>
-        <a href="{% url 'view_responses' vacancy.pk %}">View responses</a>
-    {% endif %}
-    {% if user.is_authenticated %}
-        {% if user.account_type == user.Types.JOBSEEKER %}
-            <form action="{% url 'change_response' vacancy.pk %}" method="post">
-                {% csrf_token %}
-                {% if is_responded %}
-                    <button type="submit" value="{{ vacancy.pk }}">Cancel</button>
-                {% else %}
-                    <button type="submit" value="{{ vacancy.pk }}">Response to vacancy</button>
+    <div class="container">
+        <div class="mt-2">
+            <h1 class="fw-semibold">{{ vacancy.name }}</h1>
+            <h4 class="fw-medium">
+                Posted by: <a class="text-decoration-none"
+                              href="{{ vacancy.company.get_absolute_url }}">{{ vacancy.company.name }}</a>
+            </h4>
+            <h5>Position: {{ vacancy.position }}</h5>
+        </div>
+        <div class="mt-4">
+            <p class="text-secondary-emphasis">{{ vacancy.description }}</p>
+        </div>
+        <div class="d-flex justify-content-end mt-4">
+            {% if can_change_vacancy %}
+                <a class="btn btn-primary me-3" href="{% url 'update_vacancy' vacancy.pk %}">Update info</a>
+                <a class="btn btn-outline-success" href="{% url 'view_responses' vacancy.pk %}">View responses</a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                {% if user.account_type == user.Types.JOBSEEKER %}
+                    <form action="{% url 'change_response' vacancy.pk %}" method="post">
+                        {% csrf_token %}
+                        {% if is_responded %}
+                            <button class="btn btn-danger" type="submit" value="{{ vacancy.pk }}">
+                                Cancel response
+                            </button>
+                        {% else %}
+                            <button class="btn btn-success" type="submit" value="{{ vacancy.pk }}">
+                                Response to vacancy
+                            </button>
+                        {% endif %}
+                    </form>
                 {% endif %}
-            </form>
-        {% endif %}
-    {% endif %}
-
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
