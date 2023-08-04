@@ -7,7 +7,7 @@
                     <h3>Created companies</h3>
                     {% for ownership in created_companies %}
                         {% with company=ownership.company %}
-                            {% include '_inc/job_board_info/_company_card.html' %}
+                            {% include '_inc/cards/_company_card.html' %}
                         {% endwith %}
                     {% endfor %}
                 </div>
@@ -17,7 +17,7 @@
                     <h3 class="mt-3">Owned companies</h3>
                     {% for ownership in owned_companies %}
                         {% with company=ownership.company %}
-                            {% include '_inc/job_board_info/_company_card.html' %}
+                            {% include '_inc/cards/_company_card.html' %}
                         {% endwith %}
                     {% endfor %}
                 </div>
