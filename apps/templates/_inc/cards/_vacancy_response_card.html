@@ -1,0 +1,34 @@
+{% load static %}
+<div class="card col-md-9 mt-4">
+    <div class="card-body">
+        <div class="d-flex">
+            <div class="d-flex align-items-center me-4">
+                {% if response.user.avatar %}
+                    <img class="rounded-circle" style="width: 4.5em" src="{{ response.user.avatar.url }}"
+                         alt="user-avatar">
+                {% else %}
+                    <img class="rounded-circle" style="width: 4.5em"
+                         src="{% static 'images/blank_profile_avatar.jpg' %}"
+                         alt="default-user-avatar">
+                {% endif %}
+            </div>
+            <div>
+                <h5><a href="{{ response.user.get_absolute_url }}">{{ response.user.username }}</a></h5>
+                <p class="mb-1">{{ response.status.capitalize }}</p>
+                <a href="#">View CV</a>
+            </div>
+            <div class="flex-item ms-auto">
+                <form action="{% url 'accept_jobseeker' response.vacancy.pk response.user.pk %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-success w-100">Accept</button>
+                </form>
+                {% if response.status == response.ResponseStatus.PENDING %}
+                    <form class="mt-1" action="{% url 'reject_jobseeker' response.vacancy.pk response.user.pk %}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-danger w-100">Reject</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
