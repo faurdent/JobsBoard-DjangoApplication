@@ -1,0 +1,25 @@
+{% load static %}
+<div class="card col-md-9 mt-3">
+    <div class="card-body">
+        <div class="d-flex">
+            <div class="me-3">
+                {% if person.avatar %}
+                    <img class="rounded-circle" style="width: 4em" src="{{ person.avatar.url }}" alt="user-avatar">
+                {% else %}
+                    <img class="rounded-circle" style="width: 4em" src="{% static 'images/blank_profile_avatar.jpg' %}"
+                         alt="default-user-avatar">
+                {% endif %}
+            </div>
+            <div>
+                <h5 class="card-title"><a href="{{ person.get_absolute_url }}">{{ person.username }}</a></h5>
+                <p class="card-text">
+                    {% if person.bio %}
+                        {{ person.bio|truncatewords:40 }}
+                    {% else %}
+                        Bio is empty...
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
