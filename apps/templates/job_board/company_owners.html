@@ -1,19 +1,26 @@
 {% extends "_base.html" %}
 {% block content %}
-    <h1>Owners of {{ company.name }}</h1>
-    <div>
-        <h2>Creator</h2>
-        <a href="{% url 'profile' creator.user.username %}"><h4>{{ creator.user.username }}</h4></a>
-    </div>
-    <div>
-        <h2>Owners</h2>
-    {% if owners %}
-        {% for owner_profile in owners %}
-            <h4>{{ owner_profile.user.username }}</h4>
-        {% endfor %}
-    {% else %}
-        <p>There is no owners except creator yet</p>
-    {% endif %}
-
+    <div class="container">
+        <div class="mt-3">
+            <h1 class="fw-semibold">Owners of {{ company.name }}</h1>
+        </div>
+        <div class="mt-3">
+            <h2>Creator</h2>
+            {% with creator.user as person %}
+                {% include '_inc/cards/_user_card.html' %}
+            {% endwith %}
+        </div>
+        <div class="mt-3">
+            <h2>Owners</h2>
+            {% if owners %}
+                {% for owner_profile in owners %}
+                    {% with owner_profile.user as person %}
+                        {% include '_inc/cards/_user_card.html' %}
+                    {% endwith %}
+                {% endfor %}
+            {% else %}
+                <p>There is no owners except creator yet</p>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
