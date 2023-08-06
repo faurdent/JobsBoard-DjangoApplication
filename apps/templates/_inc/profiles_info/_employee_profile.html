@@ -1,6 +1,4 @@
-{% extends "_base.html" %}
-{% block content %}
-    <h1>Employee data</h1>
+<div>
+    <h3>Your company: <a href="{{ employee_info.company.get_absolute_url }}">{{ employee_info.company }}</a></h3>
     <p>Your current position: {{ employee_info.position }}</p>
-    <h3>Your company: {{ employee_info.company }}</h3>
-{% endblock %}
+</div>
