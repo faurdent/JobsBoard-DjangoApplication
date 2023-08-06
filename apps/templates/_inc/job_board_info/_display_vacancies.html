@@ -2,7 +2,9 @@
     {% if vacancies %}
         {% for vacancy in vacancies %}
             <div class="card col-md-8 mt-4">
-                {% include "_inc/cards/_vacancy_card_body.html" %}
+                <div class="card-body d-flex flex-column">
+                    {% include "_inc/cards/_vacancy_card_body.html" %}
+                </div>
                 {% include "_inc/cards/_vacancy_card_footer.html" %}
             </div>
         {% endfor %}
