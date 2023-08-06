@@ -10,7 +10,7 @@ class IndexJobSeekerView(IndexAbstractView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({"link": reverse_lazy("employer_home"), "link_redirect_name": "Employers"})
-        context.update({"latest_vacancies": Vacancy.objects.all()[:3]})
+        context.update({"latest_vacancies": Vacancy.objects.filter(is_closed=False).all()[:3]})
         return context
 
 
