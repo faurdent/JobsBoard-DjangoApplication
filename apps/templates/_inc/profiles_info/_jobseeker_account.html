@@ -1,18 +1,30 @@
 <div>
-    {% if responses_on_vacancies %}
-        {% for response in responses_on_vacancies %}
-            <h4>{{ response.vacancy.name }}</h4>
-            <a href="{{ response.vacancy.company.get_absolute_url }}">
-                <small>{{ response.vacancy.company.name }}</small>
-            </a>
-            <p>{{ response.status.capitalize }}</p>
-        {% endfor %}
-    {% endif %}
     {% if not user.jobseeker_profile.cv %}
-        <form action="#" method="post">
-            {% csrf_token %}
-            <label for="cv-input">Upload your CV</label>
-            <input id="cv-input" type="file">
-        </form>
+        <div class="mt-3">
+            <form action="#" method="post">
+                {% csrf_token %}
+                <label for="cv-input">Upload your CV</label>
+                <input class="form-control mt-2" id="cv-input" type="file">
+                <input type="submit" class="btn btn-success mt-3">
+            </form>
+        </div>
     {% endif %}
+    {% if responses_on_vacancies %}
+        <div class="mt-5">
+            <h3>Your vacancy responses history</h3>
+            <div class="ms-md-3 ms-0">
+                {% for response in responses_on_vacancies %}
+                    {% with response.vacancy as vacancy %}
+                        <div class="card col-md-9 mt-4">
+                            <div class="card-body d-flex flex-column">
+                                {% include '_inc/cards/_vacancy_card_body.html' %}
+                                <p class="mb-1">Status: {{ response.status.capitalize }}</p>
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
 </div>

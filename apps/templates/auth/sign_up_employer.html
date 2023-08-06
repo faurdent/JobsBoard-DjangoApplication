@@ -1,6 +1,13 @@
-{% extends "auth/_auth_form.html" %}
+{% extends "_base_form.html" %}
 {% block title %}{{ block.super }} | Employer{% endblock %}
 
-{% block footer %}
-    <a href="{% url 'register_jobseeker' %}">Create job-seeker account</a>
+{% block content %}
+    <div class="container">
+        {{ block.super }}
+        <p class="text-center">
+            <a class="text-center" href="{% url 'register_jobseeker' %}">
+                Create job-seeker account
+            </a>
+        </p>
+    </div>
 {% endblock %}

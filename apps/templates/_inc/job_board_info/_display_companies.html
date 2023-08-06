@@ -1,8 +1,4 @@
+{% load static %}
 {% for company in companies %}
-    <div class="card col-md-9 mt-4">
-        <div class="card-body">
-            <h5 class="card-title"><a href="{{ company.get_absolute_url }}">{{ company.name }}</a></h5>
-            <p class="card-text">{{ company.description }}</p>
-        </div>
-    </div>
+    {% include '_inc/cards/_company_card.html' %}
 {% endfor %}

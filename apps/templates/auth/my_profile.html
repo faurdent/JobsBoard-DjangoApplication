@@ -1,12 +1,20 @@
 {% extends "_base.html" %}
-{% block content %}<h1>{{ object.username }}</h1>
-    <p>{{ object.account_type.capitalize }}</p>
-    {% if user_profile.account_type == user.Types.EMPLOYER %}
-        {% include "_inc/profiles_info/_employer_account.html" %}
-    {% elif user_profile.account_type == user.Types.JOBSEEKER %}
-        {% include "_inc/profiles_info/_jobseeker_account.html" %}
-    {% elif user_profile.account_type == user.Types.EMPLOYEE %}
-        {% include "_inc/profiles_info/_employee_profile.html" %}
-    {% endif %}
-
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="row mt-4">
+            {% include '_inc/profiles_info/_common_profile_info.html' %}
+            <div class="d-flex justify-content-end mt-3">
+                <a class="btn btn-primary" href="{% url 'update-profile' %}">Update info</a>
+                <a href="#" class="btn btn-danger ms-3">Delete</a>
+            </div>
+        </div>
+        {% if user_profile.account_type == user.Types.EMPLOYER %}
+            {% include "_inc/profiles_info/_employer_account.html" %}
+        {% elif user_profile.account_type == user.Types.JOBSEEKER %}
+            {% include "_inc/profiles_info/_jobseeker_account.html" %}
+        {% elif user_profile.account_type == user.Types.EMPLOYEE %}
+            {% include "_inc/profiles_info/_employee_profile.html" %}
+        {% endif %}
+    </div>
 {% endblock %}

@@ -77,10 +77,12 @@ class DetailCompany(DetailView):
                     company=company, owner=employer_profile
             ).first():
                 context.update({"is_company_owner": True, "is_creator": ownership.is_creator})
+        vacancies_queryset = company.vacancies.filter(is_closed=False)
         context.update({
+            "latest_vacancies": vacancies_queryset.all()[:3],
             "workers_count": company.employees.count(),
             "owners_count": company.owners.count(),
-            "vacancies_count": company.vacancies.filter(is_closed=False).count(),
+            "vacancies_count": vacancies_queryset.count(),
         })
         return context
 

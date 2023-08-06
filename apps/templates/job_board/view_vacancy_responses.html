@@ -1,27 +1,12 @@
 {% extends "_base.html" %}
 {% block content %}
-    <h1>{{ vacancy_name }}</h1>
-    {% if not vacancy_responses %}
-        <p>There is no responses yet</p>
-    {% endif %}
-    {% for response in vacancy_responses %}
-        <div>
-            <h3>{{ response.user.username }}</h3>
-            <p>{{ response.status }}</p>
-            <form action="{% url 'accept_jobseeker' response.vacancy.pk response.user.pk %}" method="post">
-                {% csrf_token %}
-                <button>Accept</button>
-            </form>
-            {% if response.status == response.ResponseStatus.PENDING %}
-                <form action="{% url 'reject_jobseeker' response.vacancy.pk response.user.pk %}" method="post">
-                    {% csrf_token %}
-                    <button>Reject</button>
-                </form>
-            {% else %}
-
-            {% endif %}
-
-            <hr>
-        </div>
-    {% endfor %}
+    <div class="container">
+        <h1>{{ vacancy_name }}</h1>
+        {% if not vacancy_responses %}
+            <p>There is no responses yet</p>
+        {% endif %}
+        {% for response in vacancy_responses %}
+            {% include '_inc/cards/_vacancy_response_card.html' %}
+        {% endfor %}
+    </div>
 {% endblock %}

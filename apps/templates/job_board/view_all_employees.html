@@ -1,19 +1,48 @@
 {% extends "_base.html" %}
+{% load static %}
 {% block content %}
-    <h1>All employees of {{ company.name }}</h1>
-    <div>
-        {{ employees }}
-        {% for employee_profile in employees %}
-            <a href="{{ employee_profile.user.get_absolute_url }}">
-                <h4>{{ employee_profile.user }}</h4>
-            </a>
-            <p>{{ employee_profile.position }}</p>
-            {% if is_owner %}
-                <form action="{% url 'fire_employee' company.pk employee_profile.user.pk %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Fire</button>
-                </form>
-            {% endif %}
-        {% endfor %}
+    <div class="container">
+        <h1 class="mt-2">All employees of {{ company.name }}</h1>
+        {% if employees %}
+            <div>
+                {% for employee_profile in employees %}
+                    <div class="card col-md-9 mt-4">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <div class="me-4">
+                                    {% if employee_profile.user.avatar %}
+                                        <img class="rounded-circle" style="width: 4em"
+                                             src="{{ employee_profile.user.avatar.url }}"
+                                             alt="user-avatar">
+                                    {% else %}
+                                        <img class="rounded-circle" style="width: 4em"
+                                             src="{% static 'images/blank_profile_avatar.jpg' %}"
+                                             alt="default-user-avatar">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <a href="{{ employee_profile.user.get_absolute_url }}">
+                                        <h4>{{ employee_profile.user }}</h4>
+                                    </a>
+                                    <p class="mb-1">Position: {{ employee_profile.position }}</p>
+                                </div>
+                                {% if is_owner %}
+                                    <div class="flex-item ms-auto">
+                                        <form action="{% url 'fire_employee' company.pk employee_profile.user.pk %}"
+                                              method="post">
+                                            {% csrf_token %}
+                                            <button class="btn btn-danger" type="submit">Fire</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Company doesn't have employees yet</p>
+        {% endif %}
+
     </div>
 {% endblock %}

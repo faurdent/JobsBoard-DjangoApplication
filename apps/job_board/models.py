@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 
 from apps.auth_app.models import JobSeekerProfile, EmployerProfile, User
+from apps.services import ImagePathsGenerator
 
 
 class CompanyOwnership(models.Model):
@@ -13,6 +14,12 @@ class CompanyOwnership(models.Model):
 class Company(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    logo = models.ImageField(
+        max_length=255,
+        null=True,
+        blank=True,
+        upload_to=ImagePathsGenerator.get_company_logo
+    )
     owners = models.ManyToManyField(EmployerProfile, through=CompanyOwnership, related_name="companies")
 
     def get_absolute_url(self):

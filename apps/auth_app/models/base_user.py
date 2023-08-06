@@ -13,11 +13,12 @@ class User(AbstractUser):
         EMPLOYEE = "EMPLOYEE", "Employee"
 
     email = models.EmailField(blank=False)
+    bio = models.TextField(blank=True, null=True)
     avatar = models.ImageField(
         max_length=255,
         null=True,
         blank=True,
-        upload_to=ImagePathsGenerator.get_avatar_path_user,
+        upload_to=ImagePathsGenerator.get_user_avatar_path,
     )
     base_type = Types.ADMIN
     account_type = models.CharField(max_length=20, choices=Types.choices)
@@ -29,3 +30,4 @@ class User(AbstractUser):
         if not self.pk:
             self.account_type = self.base_type
             return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)

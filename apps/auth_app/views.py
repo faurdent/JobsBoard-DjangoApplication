@@ -3,9 +3,9 @@ from django.contrib.auth.views import LoginView
 from django.db.models import QuerySet
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, UpdateView
 
-from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm
+from apps.auth_app.forms import SignUpEmployerForm, SignUpJobSeekerForm, LoginForm, UpdateProfileForm
 from apps.auth_app.models import JobSeeker, Employer, User
 from apps.job_board.models import CompanyOwnership, VacancyResponse
 
@@ -25,12 +25,13 @@ class JobSeekerSignUpView(CreateView):
 
 
 class LoginUserView(LoginView):
-    template_name = "auth/_auth_form.html"
+    template_name = "auth/login_form.html"
+    form_class = LoginForm
 
 
 class BaseProfileView(LoginRequiredMixin, DetailView):
     model = User
-    template_name = "auth/user_detail.html"
+    template_name = "auth/user_profile.html"
     context_object_name = "user_profile"
 
     def __init__(self, *args, **kwargs):
@@ -69,9 +70,22 @@ class MyProfileView(BaseProfileView):
         user: User = self.request.user
         match user.account_type:
             case User.Types.EMPLOYER:
-                context.update({"owned_companies": CompanyOwnership.objects.filter(owner=user.employer_profile).all()})
+                owned_companies = CompanyOwnership.objects.filter(owner=user.employer_profile)
+                context.update({
+                    "owned_companies": owned_companies.filter(is_creator=False).all(),
+                    "created_companies": owned_companies.filter(is_creator=True).all()
+                })
             case User.Types.JOBSEEKER:
                 context.update({"responses_on_vacancies": VacancyResponse.objects.filter(user=user).all()})
             case User.Types.EMPLOYEE:
                 context.update({"employee_info": user.employee_profile})
         return context
+
+
+class UpdateProfile(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UpdateProfileForm
+    template_name = "auth/update_profile.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user

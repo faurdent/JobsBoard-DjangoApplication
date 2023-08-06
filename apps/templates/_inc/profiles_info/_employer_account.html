@@ -1,22 +1,29 @@
-<div>Employer specific data</div>
-<div>
+<div class="mt-3">
     <h2>My companies:</h2>
-{% if owned_companies %}
-    {% for ownership in owned_companies %}
-        <div>
-            <a href="{{ ownership.company.get_absolute_url }}">
-                <h4>{{ ownership.company.name }}</h4>
-            </a>
-            {% if ownership.is_creator %}
-                <p>Creator</p>
-            {% else %}
-                <p>Owner</p>
+    <div class="ms-5">
+        {% if created_companies or owned_companies %}
+            {% if created_companies %}
+                <div class="mt-3">
+                    <h3>Created companies</h3>
+                    {% for ownership in created_companies %}
+                        {% with company=ownership.company %}
+                            {% include '_inc/cards/_company_card.html' %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
             {% endif %}
-            <hr>
-        </div>
-    {% endfor %}
-{% else %}
-    <p>You don't have companies, <a href="{% url 'create_company' %}">create one</a></p>
-{% endif %}
-
+            {% if owned_companies %}
+                <div>
+                    <h3 class="mt-3">Owned companies</h3>
+                    {% for ownership in owned_companies %}
+                        {% with company=ownership.company %}
+                            {% include '_inc/cards/_company_card.html' %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% else %}
+            <p>You don't have companies, <a href="{% url 'create_company' %}">create one</a></p>
+        {% endif %}
+    </div>
 </div>

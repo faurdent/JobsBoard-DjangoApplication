@@ -15,11 +15,21 @@ class ImagePathsGenerator:
         )
 
     @staticmethod
-    def get_avatar_path_user(instance, avatar: str):
+    def get_user_avatar_path(instance, avatar: str):
         _, extension = avatar.rsplit(".", maxsplit=1)
         return (
             f"users/user/avatar/"
             f"{ImagePathsGenerator._generate_pseudo_id(amount_of_iterations=4)}/"
             f"{ImagePathsGenerator._generate_pseudo_id(amount_of_iterations=1)}/"
             f"avatar.{extension}"
+        )
+
+    @staticmethod
+    def get_company_logo(instance, logo: str):
+        _, extension = logo.rsplit(".", maxsplit=1)
+        return (
+            f"companies/company/logo/"
+            f"{ImagePathsGenerator._generate_pseudo_id(amount_of_iterations=4)}/"
+            f"{ImagePathsGenerator._generate_pseudo_id(amount_of_iterations=1)}/"
+            f"logo.{extension}"
         )
