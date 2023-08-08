@@ -1,4 +1,5 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.models import Group
 from django.core.handlers.wsgi import WSGIRequest
 from django.db import transaction
 from django.shortcuts import redirect
@@ -6,7 +7,7 @@ from django.views import View
 
 from apps.auth_app.models import User
 from apps.auth_app.models.models import EmployeeProfile, Employee
-from apps.job_board.models import VacancyResponse, Vacancy
+from apps.job_board.models import VacancyResponse, Vacancy, PositionType
 
 
 class VacancyResponseView(LoginRequiredMixin, View):
@@ -24,20 +25,27 @@ class VacancyResponseView(LoginRequiredMixin, View):
         return redirect("vacancy_details", pk=vacancy.pk)
 
 
-class AcceptJobSeeker(LoginRequiredMixin, View):
+class AcceptJobSeeker(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "auth_app.add_employeeprofile"
+
     def post(self, request: WSGIRequest, *args, **kwargs):
         vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
             user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]
         ).first()
         if not vacancy_response:
             return redirect("not_found")
+
         with transaction.atomic():
-            self._update_related_data(vacancy_response)
-            EmployeeProfile.objects.create(
+            employee_profile = EmployeeProfile(
                 user=vacancy_response.user,
                 company=vacancy_response.vacancy.company,
                 position=vacancy_response.vacancy.position
             )
+            employee_profile.save()
+            self._update_related_data(vacancy_response)
+            hr_position_type = PositionType.objects.get(name="HR")
+            if employee_profile.position == hr_position_type:
+                employee_profile.user.groups.add(Group.objects.get(name="HR"))
         return redirect("company_employees", pk=vacancy_response.vacancy.company.pk)
 
     def _update_related_data(self, vacancy_response: VacancyResponse):
@@ -49,7 +57,9 @@ class AcceptJobSeeker(LoginRequiredMixin, View):
         vacancy_response.user.save()
 
 
-class RejectJobSeeker(LoginRequiredMixin, View):
+class RejectJobSeeker(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "job_board.add_employeeprofile"
+
     def post(self, request: WSGIRequest, *args, **kwargs):
         vacancy_response: VacancyResponse = VacancyResponse.objects.filter(
             user_id=self.kwargs["user_pk"], vacancy_id=self.kwargs["vacancy_pk"]

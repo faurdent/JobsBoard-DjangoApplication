@@ -5,20 +5,20 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
 from django.db.models import Model
 
-from apps.auth_app.models.models import Employee
+from apps.auth_app.models.models import EmployeeProfile
 from apps.job_board.models import Company, Vacancy, VacancyResponse
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        self._create_group("Owner", [VacancyResponse, Vacancy, Company, Employee])
-        self._create_group("HR", [Vacancy, Employee])
+        self._create_group("Owner", [VacancyResponse, Vacancy, Company, EmployeeProfile])
+        self._create_group("HR", [VacancyResponse, Vacancy, EmployeeProfile])
 
     def _create_group(self, group_name: str, models: list[Type[Model]]):
         all_permissions = []
         for model in models:
             all_permissions.extend(self.get_permissions_for_model(model, group_name))
-        owner_group, created_owner = Group.objects.get_or_create(name=group_name)
+        owner_group, created = Group.objects.get_or_create(name=group_name)
         for permission in all_permissions:
             owner_group.permissions.add(permission)
         self.stdout.write(f"{group_name} group created successfully.")
