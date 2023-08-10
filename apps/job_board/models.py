@@ -61,3 +61,12 @@ class VacancyResponse(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="users_responded")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="left_responses")
     status = models.CharField(max_length=10, choices=ResponseStatus.choices, default=ResponseStatus.PENDING)
+
+
+class OwningRequest(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="employers_requested")
+    employer = models.ForeignKey(EmployerProfile, on_delete=models.CASCADE, related_name="left_requests")
+    text = models.TextField(default=None, null=True, blank=True)
+    is_accepted = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(default=False)
