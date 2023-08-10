@@ -6,12 +6,14 @@ from django.core.management import BaseCommand
 from django.db.models import Model
 
 from apps.auth_app.models.models import EmployeeProfile
-from apps.job_board.models import Company, Vacancy, VacancyResponse
+from apps.job_board.models import Company, Vacancy, VacancyResponse, OwningRequest
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        self._create_group("Owner", [VacancyResponse, Vacancy, Company, EmployeeProfile])
+        self._create_group("Owner", [
+            VacancyResponse, Vacancy, Company, EmployeeProfile, OwningRequest
+        ])
         self._create_group("HR", [VacancyResponse, Vacancy, EmployeeProfile])
 
     def _create_group(self, group_name: str, models: list[Type[Model]]):
