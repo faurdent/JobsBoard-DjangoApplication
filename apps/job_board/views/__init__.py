@@ -1,4 +1,5 @@
-from .actions_views import AcceptJobSeeker, RejectJobSeeker, FireEmployeeView, VacancyResponseView
+from .actions_views import (AcceptJobSeeker, RejectJobSeeker, FireEmployeeView, VacancyResponseView,
+                            RequestCompanyOwnership)
 from .company_crud_views import CreateCompany, UpdateCompany, DeleteCompany, DetailCompany, ViewCompanies
 from .company_info_views import CompanyOwnersView, EmployerCompaniesView, CompanyEmployeesView, CompanyVacanciesView
 from .error_views import EntityNotFoundView

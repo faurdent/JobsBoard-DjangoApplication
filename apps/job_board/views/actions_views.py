@@ -7,7 +7,7 @@ from django.views import View
 
 from apps.auth_app.models import User
 from apps.auth_app.models.models import EmployeeProfile, Employee
-from apps.job_board.models import VacancyResponse, Vacancy, PositionType
+from apps.job_board.models import VacancyResponse, Vacancy, PositionType, Company, OwningRequest
 
 
 class VacancyResponseView(LoginRequiredMixin, View):
@@ -80,3 +80,21 @@ class FireEmployeeView(LoginRequiredMixin, View):
         employee.employee_profile.delete()
         employee.save()
         return redirect("company_employees", pk=self.kwargs["company_pk"])
+
+
+class RequestCompanyOwnership(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "job_board.add_owningrequest"
+
+    def post(self, request: WSGIRequest, *args, **kwargs):
+        company: Company = Company.objects.filter(pk=self.kwargs["company_pk"])
+        if not company:
+            return redirect("not_found")
+        employer_profile = request.user.employer_profile
+        if existing_request := OwningRequest.objects.filter(
+                employer=employer_profile, company=company
+        ):
+            existing_request.delete()
+        else:
+            new_request = OwningRequest.objects.create(employer=employer_profile)
+            company.employers_requested.add(new_request)
+        return redirect("company_details")

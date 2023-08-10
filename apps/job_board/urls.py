@@ -28,6 +28,7 @@ actions = [
     path("reject-response/<int:vacancy_pk>/<int:user_pk>", views.RejectJobSeeker.as_view(), name="reject_jobseeker"),
     path("accept-response/<int:vacancy_pk>/<int:user_pk>", views.AcceptJobSeeker.as_view(), name="accept_jobseeker"),
     path("fire-employee/<int:company_pk>/<int:user_pk>", views.FireEmployeeView.as_view(), name="fire_employee"),
+    path("request-ownership/<int:company_pk>", views.RequestCompanyOwnership.as_view(), name="request_ownership")
 ]
 
 company_info = [
